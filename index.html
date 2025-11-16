@@ -1,639 +1,589 @@
+
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Gestión OP - Oficina / Seccionadora / Bancos</title>
+  <title>Gestión OP - Oficina / Seccionadora / Pantógrafos / Bancos</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Estilos básicos -->
+  <!-- Evitar cache en móviles -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <!-- PWA -->
+  <meta name="theme-color" content="#004b7c">
+  <link rel="manifest" href="manifest.webmanifest">
+  <!-- Iconos: cuando subas icon-192.png y icon-512.png se usarán aquí -->
+  <link rel="icon" href="icon-192.png">
+
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0; padding: 0;
+      font-family: system-ui, sans-serif;
       background: #f2f2f2;
       color: #333;
     }
 
     header {
       background: #004b7c;
-      color: #fff;
+      color: white;
       padding: 10px 16px;
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 1.2rem;
     }
 
     main {
       padding: 10px 16px 40px;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    h2, h3, h4 {
-      margin-top: 0.5rem;
-      margin-bottom: 0.5rem;
+      max-width: 1300px;
+      margin: auto;
     }
 
     .panel {
-      background: #fff;
+      padding: 12px;
+      background: white;
       border-radius: 6px;
-      padding: 10px;
-      margin-bottom: 14px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
-    /* Formulario alta/edición */
+    h2,h4 { margin: 6px 0; }
+
+    /* Formulario */
     form#form-op {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 8px;
-      align-items: flex-end;
-    }
-
-    .campo {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    label {
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-
-    input[type="text"],
-    input[type="date"] {
-      padding: 6px 8px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      font-size: 0.9rem;
-    }
-
-    button {
-      border-radius: 4px;
-      border: none;
-      padding: 6px 10px;
-      font-size: 0.85rem;
-      cursor: pointer;
-    }
-
-    button.btn-principal {
-      background: #0069d9;
-      color: #fff;
-    }
-
-    button.btn-secundario {
-      background: #e2e6ea;
-      color: #333;
-    }
-
-    button.btn-peligro {
-      background: #dc3545;
-      color: #fff;
-    }
-
-    button:disabled {
-      background: #ccc;
-      cursor: default;
-    }
-
-    .acciones-form {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    /* Tablero */
-    .board-op {
-      display: flex;
-      flex-direction: column;
       gap: 10px;
     }
 
-    @media (min-width: 800px) {
-      .board-op {
-        flex-direction: row;
-      }
+    label { font-size: .8rem; font-weight: 600; }
+    input[type=text], input[type=date] {
+      padding: 6px; border-radius: 4px;
+      border: 1px solid #ccc; font-size: .9rem;
+    }
+
+    button {
+      border: none; border-radius: 4px;
+      padding: 7px 10px; cursor: pointer;
+      font-size: .85rem;
+    }
+    .btn-principal { background: #0069d9; color: white; }
+    .btn-secundario { background: #ddd; }
+    .btn-peligro { background: #dc3545; color: white; }
+
+    /* Tablero */
+    .board-op {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 14px;
     }
 
     .columna-op {
-      flex: 1;
-      border: 1px solid #ddd;
+      background: #fafafa;
+      border: 1px solid #ccc;
       border-radius: 6px;
       padding: 6px;
-      background: #fafafa;
       min-height: 120px;
     }
 
-    .columna-op h4 {
-      text-align: center;
-      margin-top: 0;
-      margin-bottom: 6px;
-      font-size: 0.95rem;
-    }
-
-    .lista-op {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
+    .lista-op { display: flex; flex-direction: column; gap: 6px; }
 
     .op-card {
-      border-radius: 4px;
-      padding: 6px;
-      border: 1px solid rgba(0,0,0,0.15);
-      background: #fff;
-      font-size: 0.85rem;
+      background: white;
+      border: 1px solid #bbb;
+      border-radius: 5px;
+      padding: 8px;
+      font-size: .85rem;
     }
 
     .op-card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: 700;
-      margin-bottom: 4px;
-      font-size: 0.9rem;
-    }
-
-    .op-card-header span {
-      font-size: 0.8rem;
-      font-weight: 500;
-    }
-
-    .op-card-detalle {
-      margin-bottom: 4px;
+      display: flex; justify-content: space-between;
+      font-weight: bold; margin-bottom: 4px;
     }
 
     .tag-urgencia {
-      display: inline-block;
-      padding: 2px 6px;
-      border-radius: 999px;
-      font-size: 0.7rem;
-      border: 1px solid rgba(0,0,0,0.12);
       background: rgba(255,255,255,0.7);
+      border: 1px solid #999;
+      padding: 2px 6px;
+      font-size: .7rem;
+      border-radius: 999px;
     }
 
     .op-card-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-      margin-top: 4px;
-    }
-
-    .op-card-buttons button {
-      font-size: 0.7rem;
-      padding: 2px 5px;
+      display: flex; flex-wrap: wrap; gap: 4px;
+      margin-top: 6px;
     }
 
     .contador {
-      font-size: 0.8rem;
       text-align: right;
-      color: #555;
-      margin-top: 4px;
+      margin-top: 6px;
+      font-size: .8rem;
     }
 
-    .texto-ayuda {
-      font-size: 0.8rem;
+    /* QR */
+    #qr-reader {
+      width: 100%;
+      max-width: 380px;
+      margin-top: 8px;
+    }
+    #qr-estado {
+      font-size: .8rem;
+      margin-top: 4px;
       color: #555;
-      margin-top: 6px;
     }
   </style>
 </head>
 <body>
-<header>
-  <h1>Gestión rápida de OP · Oficina / Seccionadora / Bancos</h1>
-</header>
+
+<header><h1>Gestión OP · Oficina / Seccionadora / Pantógrafos / Bancos</h1></header>
 
 <main>
-  <!-- Formulario OP -->
-  <section class="panel">
-    <h2>Alta / actualización de OP</h2>
-    <p class="texto-ayuda">
-      Rellena los datos y pulsa <strong>Guardar / Actualizar</strong>.  
-      La OP nueva entra siempre por <strong>Oficina</strong>. La <strong>fecha de entrega es obligatoria</strong>.
-    </p>
 
+  <!-- FORMULARIO -->
+  <section class="panel">
+    <h2>Crear o Actualizar OP</h2>
     <form id="form-op">
-      <div class="campo">
-        <label for="op">OP *</label>
-        <input type="text" id="op" required placeholder="Ej: 2506345">
+      <div>
+        <label>OP *</label>
+        <input type="text" id="op" required>
       </div>
-      <div class="campo">
-        <label for="descripcion">Descripción mueble</label>
-        <input type="text" id="descripcion" placeholder="Ej: Mueble baño blanco 120 cm">
+      <div>
+        <label>Mueble</label>
+        <input type="text" id="descripcion">
       </div>
-      <div class="campo">
-        <label for="cliente">Cliente</label>
-        <input type="text" id="cliente" placeholder="Ej: Reformas López">
+      <div>
+        <label>Cliente</label>
+        <input type="text" id="cliente">
       </div>
-      <div class="campo">
-        <label for="fechaEntrega">Fecha de entrega *</label>
+      <div>
+        <label>Fecha Entrega *</label>
         <input type="date" id="fechaEntrega" required>
       </div>
-      <div class="campo acciones-form">
-        <button type="submit" class="btn-principal">Guardar / Actualizar</button>
-        <button type="button" id="btn-limpiar-form" class="btn-secundario">Limpiar formulario</button>
+      <div>
+        <button class="btn-principal" type="submit">Guardar / Actualizar</button>
+        <button type="button" class="btn-secundario" id="btn-limpiar-form">Limpiar</button>
       </div>
     </form>
   </section>
 
-  <!-- Tablero -->
+  <!-- ESCÁNER QR / CÓDIGO -->
+  <section class="panel">
+    <h2>Escanear OP con la cámara</h2>
+    <p style="font-size:.85rem;">
+      Pulsa <strong>Iniciar cámara</strong>, apunta al código (QR o código legible) de la OP
+      y cuando lo lea, rellenará el campo <strong>OP</strong> automáticamente.
+    </p>
+    <button id="btn-toggle-qr" class="btn-secundario">Iniciar cámara</button>
+    <div id="qr-estado"></div>
+    <div id="qr-reader" style="display:none;"></div>
+  </section>
+
+  <!-- TABLERO -->
   <section class="panel">
     <h2>Estado de las OP</h2>
-    <p class="texto-ayuda">
-      Colores por urgencia según fecha de entrega. Puedes <strong>subir/bajar</strong> prioridad dentro de cada columna, 
-      <strong>mover</strong> entre Oficina / Seccionadora / Bancos, <strong>editar</strong> y <strong>borrar</strong>.
-    </p>
 
     <div class="board-op">
+
+      <!-- OFICINA -->
       <div class="columna-op" data-seccion="Oficina">
         <h4>Oficina</h4>
         <div id="col-oficina" class="lista-op"></div>
         <div id="count-oficina" class="contador"></div>
       </div>
 
+      <!-- SECCIONADORA -->
       <div class="columna-op" data-seccion="Seccionadora">
         <h4>Seccionadora</h4>
         <div id="col-seccionadora" class="lista-op"></div>
         <div id="count-seccionadora" class="contador"></div>
       </div>
 
+      <!-- PANTÓGRAFOS -->
+      <div class="columna-op" data-seccion="Pantografos">
+        <h4>Pantógrafos</h4>
+        <div id="col-pantografos" class="lista-op"></div>
+        <div id="count-pantografos" class="contador"></div>
+      </div>
+
+      <!-- BANCOS -->
       <div class="columna-op" data-seccion="Bancos">
         <h4>Bancos</h4>
         <div id="col-bancos" class="lista-op"></div>
         <div id="count-bancos" class="contador"></div>
       </div>
+
     </div>
   </section>
+
 </main>
 
-<!-- Lógica -->
+<!-- Librería de escaneo QR -->
+<script src="https://unpkg.com/html5-qrcode" defer></script>
+
 <script>
-  // ==============================
-  //  Datos base y utilidades
-  // ==============================
-  const STORAGE_KEY = 'ops_produccion_v2';
+/* ================================
+   LOCAL STORAGE
+================================ */
+const STORAGE_KEY = "ops_produccion_v5";
+let ops = [];
 
-  let ops = [];
+function cargarOps() {
+  ops = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+}
 
-  function cargarOps() {
-    try {
-      const texto = localStorage.getItem(STORAGE_KEY);
-      if (!texto) {
-        ops = [];
-        return;
+function guardarOps() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(ops));
+}
+
+/* ================================
+   UTILIDADES
+================================ */
+function diasHasta(fecha) {
+  const hoy = new Date();
+  const f = new Date(fecha + "T00:00:00");
+  return Math.round((f - hoy) / 86400000);
+}
+
+function colorPorUrgencia(fecha) {
+  const d = diasHasta(fecha);
+  if (isNaN(d)) return "#ffffff";
+  if (d < 0) return "#ffcccc";
+  if (d <= 2) return "#ffe0cc";
+  if (d <= 7) return "#fff3cd";
+  return "#d4edda";
+}
+
+function textoUrgencia(fecha) {
+  const d = diasHasta(fecha);
+  if (isNaN(d)) return "-";
+  if (d < 0) return `Vencida ${Math.abs(d)}d`;
+  if (d === 0) return "Hoy";
+  if (d === 1) return "Mañana";
+  return `En ${d}d`;
+}
+
+function siguienteOrden(seccion) {
+  const lista = ops.filter(o => o.seccion === seccion);
+  if (!lista.length) return 1;
+  return Math.max(...lista.map(o => o.orden || 0)) + 1;
+}
+
+/* ================================
+   CRUD
+================================ */
+function upsertOP(data) {
+  let item = ops.find(o => o.op === data.op);
+
+  if (!item) {
+    ops.push({
+      op: data.op,
+      descripcion: data.descripcion || "",
+      cliente: data.cliente || "",
+      fechaEntrega: data.fechaEntrega,
+      seccion: "Oficina",
+      orden: siguienteOrden("Oficina")
+    });
+  } else {
+    item.descripcion = data.descripcion;
+    item.cliente = data.cliente;
+    item.fechaEntrega = data.fechaEntrega;
+  }
+
+  guardarOps();
+  render();
+}
+
+function borrarOP(cod) {
+  if (!confirm("¿Borrar OP " + cod + "?")) return;
+  ops = ops.filter(o => o.op !== cod);
+  guardarOps();
+  render();
+}
+
+function moverOP(cod, destino) {
+  let item = ops.find(o => o.op === cod);
+  if (!item) return;
+  item.seccion = destino;
+  item.orden = siguienteOrden(destino);
+  guardarOps();
+  render();
+}
+
+function subirOP(cod) {
+  let op = ops.find(o => o.op === cod);
+  if (!op) return;
+  let lista = ops.filter(o => o.seccion === op.seccion).sort((a,b)=>a.orden-b.orden);
+  let idx = lista.indexOf(op);
+  if (idx <= 0) return;
+
+  let arriba = lista[idx - 1];
+  [op.orden, arriba.orden] = [arriba.orden, op.orden];
+  guardarOps();
+  render();
+}
+
+function bajarOP(cod) {
+  let op = ops.find(o => o.op === cod);
+  if (!op) return;
+  let lista = ops.filter(o => o.seccion === op.seccion).sort((a,b)=>a.orden-b.orden);
+  let idx = lista.indexOf(op);
+  if (idx === lista.length - 1) return;
+
+  let abajo = lista[idx + 1];
+  [op.orden, abajo.orden] = [abajo.orden, op.orden];
+  guardarOps();
+  render();
+}
+
+function editarOP(cod) {
+  let item = ops.find(o => o.op === cod);
+  if (!item) return;
+
+  let d = prompt("Descripción:", item.descripcion);
+  if (d === null) return;
+
+  let c = prompt("Cliente:", item.cliente);
+  if (c === null) return;
+
+  let f = prompt("Fecha entrega (YYYY-MM-DD):", item.fechaEntrega);
+  if (!f) return alert("Fecha obligatoria");
+
+  item.descripcion = d;
+  item.cliente = c;
+  item.fechaEntrega = f;
+
+  guardarOps();
+  render();
+}
+
+/* ================================
+   BORRADO AUTOMÁTICO 15 DÍAS
+================================ */
+function limpiarAntiguas() {
+  let hoy = new Date();
+  let eliminar = ops.filter(o => {
+    let f = new Date(o.fechaEntrega + "T00:00:00");
+    return (hoy - f) / 86400000 > 15;
+  });
+
+  if (eliminar.length > 0) {
+    if (confirm("Hay " + eliminar.length + " OP antiguas (+15 días). ¿Borrar?")) {
+      let ids = new Set(eliminar.map(x => x.op));
+      ops = ops.filter(o => !ids.has(o.op));
+      guardarOps();
+    }
+  }
+}
+
+/* ================================
+   RENDER TABLERO
+================================ */
+function botonesMovimientoHTML(op) {
+  if (op.seccion === "Oficina")
+    return `<button onclick="moverOP('${op.op}','Seccionadora')">▶ Seccionadora</button>`;
+
+  if (op.seccion === "Seccionadora")
+    return `
+      <button onclick="moverOP('${op.op}','Oficina')">◀ Oficina</button>
+      <button onclick="moverOP('${op.op}','Pantografos')">▶ Pantógrafos</button>
+    `;
+
+  if (op.seccion === "Pantografos")
+    return `
+      <button onclick="moverOP('${op.op}','Seccionadora')">◀ Seccionadora</button>
+      <button onclick="moverOP('${op.op}','Bancos')">▶ Bancos</button>
+    `;
+
+  if (op.seccion === "Bancos")
+    return `<button onclick="moverOP('${op.op}','Pantografos')">◀ Pantógrafos</button>`;
+
+  return "";
+}
+
+function render() {
+  const col = {
+    Oficina: document.getElementById("col-oficina"),
+    Seccionadora: document.getElementById("col-seccionadora"),
+    Pantografos: document.getElementById("col-pantografos"),
+    Bancos: document.getElementById("col-bancos")
+  };
+
+  const cnt = {
+    Oficina: document.getElementById("count-oficina"),
+    Seccionadora: document.getElementById("count-seccionadora"),
+    Pantografos: document.getElementById("count-pantografos"),
+    Bancos: document.getElementById("count-bancos")
+  };
+
+  Object.values(col).forEach(c => c.innerHTML = "");
+  Object.values(cnt).forEach(c => c.innerHTML = "");
+
+  const secciones = ["Oficina", "Seccionadora", "Pantografos", "Bancos"];
+
+  secciones.forEach(sec => {
+    let lista = ops
+      .filter(o => o.seccion === sec)
+      .sort((a,b)=> (a.orden || 0) - (b.orden || 0));
+
+    cnt[sec].innerText = "Total: " + lista.length;
+
+    lista.forEach(op => {
+      let card = document.createElement("div");
+      card.className = "op-card";
+      card.style.background = colorPorUrgencia(op.fechaEntrega);
+
+      card.innerHTML = `
+        <div class="op-card-header">
+          OP ${op.op}
+          <span class="tag-urgencia">${textoUrgencia(op.fechaEntrega)}</span>
+        </div>
+
+        <div><strong>Mueble:</strong> ${op.descripcion || "-"}</div>
+        <div><strong>Cliente:</strong> ${op.cliente || "-"}</div>
+        <div><strong>Entrega:</strong> ${op.fechaEntrega || "-"}</div>
+
+        <div class="op-card-buttons">
+          <button onclick="subirOP('${op.op}')">▲</button>
+          <button onclick="bajarOP('${op.op}')">▼</button>
+          ${botonesMovimientoHTML(op)}
+          <button onclick="editarOP('${op.op}')">Editar</button>
+          <button class="btn-peligro" onclick="borrarOP('${op.op}')">Borrar</button>
+        </div>
+      `;
+
+      col[sec].appendChild(card);
+    });
+  });
+}
+
+/* ================================
+   FORMULARIO
+================================ */
+function initForm() {
+  const f = document.getElementById("form-op");
+  const inputOP = document.getElementById("op");
+
+  f.addEventListener("submit", e => {
+    e.preventDefault();
+
+    let op = inputOP.value.trim();
+    let descripcion = document.getElementById("descripcion").value.trim();
+    let cliente = document.getElementById("cliente").value.trim();
+    let fecha = document.getElementById("fechaEntrega").value;
+
+    if (!op) return alert("OP requerida");
+    if (!fecha) return alert("Fecha obligatoria");
+
+    upsertOP({ op, descripcion, cliente, fechaEntrega: fecha });
+    f.reset();
+    inputOP.focus();
+  });
+
+  document
+    .getElementById("btn-limpiar-form")
+    .addEventListener("click", () => f.reset());
+}
+
+/* ================================
+   ESCÁNER QR / CÁMARA
+================================ */
+let qrScanner = null;
+let qrRunning = false;
+
+function initQR() {
+  const btn = document.getElementById("btn-toggle-qr");
+  const estado = document.getElementById("qr-estado");
+  const divReader = document.getElementById("qr-reader");
+  const inputOP = document.getElementById("op");
+
+  if (!btn || !divReader) return;
+
+  btn.addEventListener("click", async () => {
+    if (qrRunning) {
+      // Parar
+      if (qrScanner) {
+        await qrScanner.stop().catch(()=>{});
+        await qrScanner.clear().catch(()=>{});
       }
-      const parsed = JSON.parse(texto);
-      if (!Array.isArray(parsed)) {
-        ops = [];
-        return;
-      }
-      // Normalizamos estructura
-      ops = parsed.map((op, index) => ({
-        op: op.op || '',
-        descripcion: op.descripcion || '',
-        cliente: op.cliente || '',
-        fechaEntrega: op.fechaEntrega || '',
-        seccion: op.seccion || 'Oficina',
-        orden: (typeof op.orden === 'number') ? op.orden : (index + 1)
-      }));
-    } catch (e) {
-      console.error('Error al leer ops de localStorage', e);
-      ops = [];
-    }
-  }
-
-  function guardarOps() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(ops));
-  }
-
-  function obtenerSiguienteOrden(seccion) {
-    const lista = ops.filter(o => o.seccion === seccion);
-    if (lista.length === 0) return 1;
-    const maxOrden = Math.max(...lista.map(o => o.orden || 0));
-    return maxOrden + 1;
-  }
-
-  // Diferencia en días entre hoy y fechaEntrega
-  function diasHasta(fechaTexto) {
-    if (!fechaTexto) return null;
-    const hoy = new Date();
-    const fecha = new Date(fechaTexto + 'T00:00:00');
-    const diffMs = fecha - hoy;
-    const diffDias = Math.round(diffMs / (1000 * 60 * 60 * 24));
-    return diffDias;
-  }
-
-  // Color de fondo por urgencia
-  function colorPorUrgencia(fechaTexto) {
-    const d = diasHasta(fechaTexto);
-    if (d === null) return '#ffffff';
-
-    if (d < 0) return '#ffcccc';     // vencida
-    if (d <= 2) return '#ffe0cc';    // muy urgente
-    if (d <= 7) return '#fff3cd';    // próxima
-    return '#d4edda';                // holgado
-  }
-
-  // Texto etiqueta urgencia
-  function textoUrgencia(fechaTexto) {
-    const d = diasHasta(fechaTexto);
-    if (d === null) return 'Sin fecha';
-
-    if (d < 0) {
-      const abs = Math.abs(d);
-      return `Vencida hace ${abs} día${abs === 1 ? '' : 's'}`;
-    }
-    if (d === 0) return 'Entrega hoy';
-    if (d === 1) return 'Entrega mañana';
-    return `Entrega en ${d} día${d === 1 ? '' : 's'}`;
-  }
-
-  // ==============================
-  //  CRUD de OP
-  // ==============================
-  function upsertOP(datos) {
-    const idx = ops.findIndex(o => o.op === datos.op);
-    if (idx === -1) {
-      // Nueva OP
-      const nueva = {
-        op: datos.op,
-        descripcion: datos.descripcion || '',
-        cliente: datos.cliente || '',
-        fechaEntrega: datos.fechaEntrega,
-        seccion: 'Oficina',
-        orden: obtenerSiguienteOrden('Oficina')
-      };
-      ops.push(nueva);
-    } else {
-      // Actualizar OP existente manteniendo sección y orden
-      const existente = ops[idx];
-      existente.descripcion = datos.descripcion || '';
-      existente.cliente = datos.cliente || '';
-      existente.fechaEntrega = datos.fechaEntrega;
-    }
-    guardarOps();
-    renderBoardOP();
-  }
-
-  function borrarOP(codOp) {
-    const op = ops.find(o => o.op === codOp);
-    if (!op) return;
-    const ok = confirm(`¿Seguro que quieres borrar la OP ${codOp}?`);
-    if (!ok) return;
-    ops = ops.filter(o => o.op !== codOp);
-    guardarOps();
-    renderBoardOP();
-  }
-
-  function moverOP(codOp, nuevaSeccion) {
-    const op = ops.find(o => o.op === codOp);
-    if (!op) return;
-    op.seccion = nuevaSeccion;
-    op.orden = obtenerSiguienteOrden(nuevaSeccion);
-    guardarOps();
-    renderBoardOP();
-  }
-
-  function subirOP(codOp) {
-    const op = ops.find(o => o.op === codOp);
-    if (!op) return;
-
-    const mismaSeccion = ops
-      .filter(o => o.seccion === op.seccion)
-      .sort((a, b) => a.orden - b.orden);
-
-    const index = mismaSeccion.findIndex(o => o.op === codOp);
-    if (index <= 0) return;
-
-    const opArriba = mismaSeccion[index - 1];
-    const temp = op.orden;
-    op.orden = opArriba.orden;
-    opArriba.orden = temp;
-
-    guardarOps();
-    renderBoardOP();
-  }
-
-  function bajarOP(codOp) {
-    const op = ops.find(o => o.op === codOp);
-    if (!op) return;
-
-    const mismaSeccion = ops
-      .filter(o => o.seccion === op.seccion)
-      .sort((a, b) => a.orden - b.orden);
-
-    const index = mismaSeccion.findIndex(o => o.op === codOp);
-    if (index === -1 || index >= mismaSeccion.length - 1) return;
-
-    const opAbajo = mismaSeccion[index + 1];
-    const temp = op.orden;
-    op.orden = opAbajo.orden;
-    opAbajo.orden = temp;
-
-    guardarOps();
-    renderBoardOP();
-  }
-
-  function editarOP(codOp) {
-    const op = ops.find(o => o.op === codOp);
-    if (!op) return;
-
-    const nuevaDesc = prompt('Descripción mueble:', op.descripcion || '');
-    if (nuevaDesc === null) return;
-
-    const nuevoCliente = prompt('Cliente:', op.cliente || '');
-    if (nuevoCliente === null) return;
-
-    const nuevaFecha = prompt('Fecha entrega (YYYY-MM-DD):', op.fechaEntrega || '');
-    if (nuevaFecha === null || !nuevaFecha.trim()) {
-      alert('La fecha de entrega es obligatoria');
+      qrRunning = false;
+      divReader.style.display = "none";
+      btn.textContent = "Iniciar cámara";
+      estado.textContent = "";
       return;
     }
 
-    op.descripcion = nuevaDesc.trim();
-    op.cliente = nuevoCliente.trim();
-    op.fechaEntrega = nuevaFecha.trim();
-
-    guardarOps();
-    renderBoardOP();
-  }
-
-  // ==============================
-  //  Limpieza automática >15 días
-  // ==============================
-  function limpiarOPAntiguas() {
-    const hoy = new Date();
-    const candidatos = ops.filter(op => {
-      if (!op.fechaEntrega) return false;
-      const fecha = new Date(op.fechaEntrega + 'T00:00:00');
-      const diffMs = hoy - fecha;
-      const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-      return diffDias > 15;
-    });
-
-    if (candidatos.length === 0) return;
-
-    const ok = confirm(
-      `Hay ${candidatos.length} OP con fecha de entrega de hace más de 15 días.\n` +
-      `¿Quieres borrarlas automáticamente?`
-    );
-    if (!ok) return;
-
-    const ids = new Set(candidatos.map(c => c.op));
-    ops = ops.filter(o => !ids.has(o.op));
-    guardarOps();
-    renderBoardOP();
-  }
-
-  // ==============================
-  //  Render tablero
-  // ==============================
-  function botonesMovimientoHTML(op) {
-    if (op.seccion === 'Oficina') {
-      return `<button onclick="moverOP('${op.op}', 'Seccionadora')">▶ A Seccionadora</button>`;
-    }
-    if (op.seccion === 'Seccionadora') {
-      return `
-        <button onclick="moverOP('${op.op}', 'Oficina')">◀ A Oficina</button>
-        <button onclick="moverOP('${op.op}', 'Bancos')">▶ A Bancos</button>
-      `;
-    }
-    if (op.seccion === 'Bancos') {
-      return `<button onclick="moverOP('${op.op}', 'Seccionadora')">◀ A Seccionadora</button>`;
-    }
-    return '';
-  }
-
-  function renderBoardOP() {
-    const colOficina = document.getElementById('col-oficina');
-    const colSeccionadora = document.getElementById('col-seccionadora');
-    const colBancos = document.getElementById('col-bancos');
-    const countOficina = document.getElementById('count-oficina');
-    const countSeccionadora = document.getElementById('count-seccionadora');
-    const countBancos = document.getElementById('count-bancos');
-
-    if (!colOficina || !colSeccionadora || !colBancos) return;
-
-    colOficina.innerHTML = '';
-    colSeccionadora.innerHTML = '';
-    colBancos.innerHTML = '';
-
-    const secciones = ['Oficina', 'Seccionadora', 'Bancos'];
-    const contadores = {
-      'Oficina': 0,
-      'Seccionadora': 0,
-      'Bancos': 0
-    };
-
-    secciones.forEach(seccion => {
-      const lista = ops
-        .filter(op => op.seccion === seccion)
-        .sort((a, b) => (a.orden || 0) - (b.orden || 0));
-
-      lista.forEach(op => {
-        contadores[seccion]++;
-
-        const card = document.createElement('div');
-        card.className = 'op-card';
-        card.style.backgroundColor = colorPorUrgencia(op.fechaEntrega);
-
-        const etiqueta = textoUrgencia(op.fechaEntrega);
-
-        card.innerHTML = `
-          <div class="op-card-header">
-            <div>OP: ${op.op}</div>
-            <span class="tag-urgencia">${etiqueta}</span>
-          </div>
-          <div class="op-card-detalle">
-            <div><strong>Mueble:</strong> ${op.descripcion || '-'}</div>
-            <div><strong>Cliente:</strong> ${op.cliente || '-'}</div>
-            <div><strong>Entrega:</strong> ${op.fechaEntrega || '-'}</div>
-          </div>
-          <div class="op-card-buttons">
-            <button onclick="subirOP('${op.op}')">▲</button>
-            <button onclick="bajarOP('${op.op}')">▼</button>
-            ${botonesMovimientoHTML(op)}
-            <button onclick="editarOP('${op.op}')">Editar</button>
-            <button class="btn-peligro" onclick="borrarOP('${op.op}')">Borrar</button>
-          </div>
-        `;
-
-        if (seccion === 'Oficina') colOficina.appendChild(card);
-        if (seccion === 'Seccionadora') colSeccionadora.appendChild(card);
-        if (seccion === 'Bancos') colBancos.appendChild(card);
-      });
-    });
-
-    countOficina.textContent = `Total: ${contadores['Oficina']}`;
-    countSeccionadora.textContent = `Total: ${contadores['Seccionadora']}`;
-    countBancos.textContent = `Total: ${contadores['Bancos']}`;
-  }
-
-  // ==============================
-  //  Formulario
-  // ==============================
-  function initFormulario() {
-    const form = document.getElementById('form-op');
-    const inputOP = document.getElementById('op');
-    const inputDesc = document.getElementById('descripcion');
-    const inputCliente = document.getElementById('cliente');
-    const inputFecha = document.getElementById('fechaEntrega');
-    const btnLimpiar = document.getElementById('btn-limpiar-form');
-
-    if (!form) return;
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const op = (inputOP.value || '').trim();
-      const descripcion = (inputDesc.value || '').trim();
-      const cliente = (inputCliente.value || '').trim();
-      const fechaEntrega = (inputFecha.value || '').trim();
-
-      if (!op) {
-        alert('La OP es obligatoria');
-        return;
-      }
-      if (!fechaEntrega) {
-        alert('La fecha de entrega es obligatoria');
+    // Iniciar
+    try {
+      if (!window.Html5Qrcode) {
+        estado.textContent = "Cargando librería de cámara...";
         return;
       }
 
-      upsertOP({ op, descripcion, cliente, fechaEntrega });
-      form.reset();
-      inputOP.focus();
-    });
+      divReader.style.display = "block";
+      estado.textContent = "Abriendo cámara...";
 
-    btnLimpiar.addEventListener('click', () => {
-      form.reset();
-      inputOP.focus();
-    });
-  }
+      qrScanner = new Html5Qrcode("qr-reader");
 
-  // ==============================
-  //  Inicio
-  // ==============================
-  window.addEventListener('load', () => {
-    cargarOps();
-    limpiarOPAntiguas(); // pregunta si quieres borrar las muy viejas
-    renderBoardOP();
-    initFormulario();
+      await qrScanner.start(
+        { facingMode: "environment" },
+        {
+          fps: 10,
+          qrbox: { width: 250, height: 250 }
+        },
+        (decodedText) => {
+          // Cuando lee algo
+          inputOP.value = decodedText.trim();
+          estado.textContent = "Leído: " + decodedText;
+        },
+        (error) => {
+          // errores de lectura continuos: no hacemos nada
+        }
+      );
+
+      qrRunning = true;
+      btn.textContent = "Parar cámara";
+      estado.textContent = "Apunta al código de la OP.";
+    } catch (err) {
+      console.error(err);
+      estado.textContent = "No se pudo acceder a la cámara.";
+      divReader.style.display = "none";
+      qrRunning = false;
+    }
   });
+}
 
-  // Exponer funciones al global para los onclick
-  window.moverOP = moverOP;
-  window.subirOP = subirOP;
-  window.bajarOP = bajarOP;
-  window.editarOP = editarOP;
-  window.borrarOP = borrarOP;
+/* ================================
+   SERVICE WORKER (PWA)
+================================ */
+function initServiceWorker() {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").catch(err => {
+      console.log("SW error:", err);
+    });
+  }
+}
+
+/* ================================
+   INICIO
+================================ */
+window.onload = () => {
+  cargarOps();
+  limpiarAntiguas();
+  initForm();
+  render();
+  initQR();
+  initServiceWorker();
+};
+
+// Global para onclick
+window.moverOP = moverOP;
+window.subirOP = subirOP;
+window.bajarOP = bajarOP;
+window.editarOP = editarOP;
+window.borrarOP = borrarOP;
 </script>
+
 </body>
 </html>
-
