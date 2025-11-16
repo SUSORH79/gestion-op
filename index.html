@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gestión Producción – OP</title>
+
+<!-- Necesario para PWA -->
+<meta name="theme-color" content="#1a73e8" />
+<link rel="manifest" href="manifest.webmanifest" />
+
+<style>
+ body {
+   font-family: Arial, sans-serif;
+   margin: 0;
+   padding: 0;
+   background:#f2f2f2;
+ }
+ header {
+   background:#1a73e8;
+   color:white;
+   padding:15px;
+   font-size:20px;
+   text-align:center;
+ }
+ .container {
+   padding:15px;
+ }
+ .op-card {
+   background:white;
+   padding:12px 15px;
+   margin-bottom:10px;
+   border-radius:8px;
+   box-shadow:0 1px 3px rgba(0,0,0,0.1);
+   cursor:pointer;
+ }
+ .op-card:hover {
+   box-shadow:0 2px 6px rgba(0,0,0,0.16);
+ }
+ .btn {
+   background:#1a73e8;
+   color:white;
+   border:none;
+   padding:8px 12px;
+   border-radius:6px;
+   cursor:pointer;
+   font-size:14px;
+ }
+ .btn:active {
+   transform: scale(0.97);
+ }
+ .btn-secondary {
+   background:#6c757d;
+ }
+ .btn-success {
+   background:#28a745;
+ }
+ #scannerSim {
+   margin-top:20px;
+   background:white;
+   padding:15px;
+   border-radius:8px;
+ }
+ .tag-seccion {
+   background:#e0e0e0;
+   padding:2px 6px;
+   border-radius:4px;
+   font-size:12px;
+ }
+ .tag-prio {
+   padding:2px 6px;
+   border-radius:4px;
+   font-size:12px;
+ }
+ .tag-prio-alta {
+   background:#e53935;
+   color:white;
+ }
+ .tag-prio-media {
+   background:#fb8c00;
+   color:white;
+ }
+ .tag-prio-baja {
+   background:#43a047;
+   color:white;
+ }
+ .filters {
+   background:white;
+   padding:10px;
+   border-radius:8px;
+   margin-bottom:15px;
+   box-shadow:0 1px 3px rgba(0,0,0,0.08);
+   display:flex;
+   flex-wrap:wrap;
+   gap:8px;
+ }
+ .filters select,
+ .filters input {
+   padding:6px;
+   border-radius:4px;
+   border:1px solid #ccc;
+   font-size:14px;
+ }
+ .section-title {
+   margin-top:15px;
+   margin-bottom:5px;
+   font-weight:bold;
+   font-size:15px;
+   color:#555;
+ }
+ .historial-list {
+   margin-top:8px;
+   font-size:12px;
+   color:#444;
+ }
+ .historial-list li {
+   margin-bottom:4px;
+ }
+</style>
+</head>
+
+<body>
+<header>Gestión Producción – Simulación</header>
+
+<div class="container">
+
+  <!-- Filtros -->
+  <div class="filters">
+    <select id="filtroSeccion" onchange="renderOrdenes()">
+      <option value="Todas">Todas las secciones</option>
+      <option value="Corte">Corte</option>
+      <option value="Pantógrafos">Pantógrafos</option>
+      <option value="Bancos">Bancos</option>
+      <option value="Barnizado">Barnizado</option>
+      <option value="Montaje">Montaje</option>
+      <option value="Archivo">Archivo</option>
+    </select>
+
+    <select id="filtroPrioridad" onchange="renderOrdenes()">
+      <option value="Todas">Todas las prioridades</option>
+      <option value="Alta">Alta</option>
+      <option value="Media">Media</option>
+      <option value="Baja">Baja</option>
+    </select>
+
+    <input id="filtroBuscar" placeholder="Buscar por OP o cliente" oninput="renderOrdenes()" />
+
+    <button class="btn btn-secondary" onclick="limpiarFiltros()">Limpiar filtros</button>
+  </div>
+
+  <!-- Lista de órdenes -->
+  <h3>Órdenes de producción</h3>
+  <div id="opList"></div>
+
+  <!-- Métodos de escaneo -->
+  <div style="margin-top:15px; margin-bottom:10px;">
+    <button class="btn" onclick="abrirScannerManual()">Introducir código manual</button>
+    <button class="btn btn-success" style="margin-left:8px;" onclick="abrirScannerCamara()">Escanear con cámara</button>
+  </div>
+
+  <!-- Simulador / Editor -->
+  <div id="scannerSim" style="display:none;">
+    <h3>Escanear / abrir OP</h3>
+    <p>Introduce un código OP:</p>
+
+    <input id="codigoInput" placeholder="Ej: 2505823" style="padding:8px; width:100%;" />
+    <button class="btn" style="margin-top:10px;" onclick="simularEscaneo()">Cargar OP</button>
+
+    <p id="resultado" style="margin-top:15px; font-weight:bold;"></p>
+
+    <!-- Editor -->
+    <div id="editorOP"
+         style="margin-top:15px; display:none; background:#fafafa; padding:10px; border-radius:8px; border:1px solid #ddd;">
+
+      <p><strong>OP actual:</strong> <span id="opCodigo"></span></p>
+
+      <label>Cliente (opcional):</label>
+      <input id="clienteInput" style="padding:8px; width:100%; margin-bottom:8px;" />
+
+      <label>Sección:</label>
+      <select id="seccionSelect" style="padding:8px; width:100%; margin-bottom:8px;">
+        <option value="Corte">Corte</option>
+        <option value="Pantógrafos">Pantógrafos</option>
+        <option value="Bancos">Bancos</option>
+        <option value="Barnizado">Barnizado</option>
+        <option value="Montaje">Montaje</option>
+        <option value="Archivo">Archivo</option>
+      </select>
+
+      <label>Fecha de entrega:</label>
+      <input type="date" id="fechaEntrega" style="padding:8px; width:100%; margin-bottom:8px;" />
+
+      <label>Prioridad:</label>
+      <select id="prioridadSelect" style="padding:8px; width:100%; margin-bottom:8px;">
+        <option value="Alta">Alta</option>
+        <option value="Media" selected>Media</option>
+        <option value="Baja">Baja</option>
+      </select>
+
+      <div style="display:flex; gap:8px; margin-top:5px;">
+        <button class="btn" onclick="guardarOP()">Guardar / Actualizar</button>
+        <button class="btn btn-secondary" onclick="toggleHistorial()">Historial</button>
+        <button class="btn" style="background:#dc3545" onclick="eliminarOP()">Eliminar</button>
+      </div>
+
+      <ul id="historialOP" class="historial-list" style="display:none;"></ul>
+      <p id="movimientoResultado" style="margin-top:10px; font-weight:bold;"></p>
+    </div>
+  </div>
+</div>
+
+<!-- =============================
+     LÓGICA JAVASCRIPT DE LA APP
+     ============================= -->
+
+<script>
+/* ------- PERSISTENCIA LOCAL -------- */
+const STORAGE_KEY = 'op_app_ordenes_v1';
+let ordenes = [];
+
+function loadOrdenes() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (Array.isArray(data)) ordenes = data;
+  } catch(e) { console.error(e); }
+}
+
+function saveOrdenes() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(ordenes));
+}
+
+/* --------- UTILIDADES --------- */
+
+function limpiarFiltros() {
+  document.getElementById('filtroSeccion').value = 'Todas';
+  document.getElementById('filtroPrioridad').value = 'Todas';
+  document.getElementById('filtroBuscar').value = '';
+  renderOrdenes();
+}
+
+/* Limpieza automática para Archivo */
+function limpiarAntiguas() {
+  const ahora = new Date();
+  const DIA = 86400000;
+
+  const paraBorrar = ordenes.filter(op => {
+    if (op.seccion !== "Archivo") return false;
+    if (!op.fechaEntrega) return false;
+    const f = new Date(op.fechaEntrega);
+    if (isNaN(f)) return false;
+    return (ahora - f) / DIA >= 15;
+  }).map(op => op.codigo);
+
+  if (paraBorrar.length > 0) {
+    if (confirm(`Hay ${paraBorrar.length} OP en ARCHIVO con más de 15 días. ¿Borrarlas?`)) {
+      ordenes = ordenes.filter(o => !paraBorrar.includes(o.codigo));
+      saveOrdenes();
+    }
+  }
+}
+
+/* ---------- RENDER DEL TABLERO ---------- */
+
+function renderOrdenes() {
+  limpiarAntiguas();
+
+  const cont = document.getElementById('opList');
+  cont.innerHTML = '';
+
+  const filtroSec = document.getElementById('filtroSeccion').value;
+  const filtroPri = document.getElementById('filtroPrioridad').value;
+  const filtroTxt = document.getElementById('filtroBuscar').value.toLowerCase();
+
+  const prioridadValor = { Alta:1, Media:2, Baja:3 };
+
+  let lista = ordenes.filter(op => {
+    if (filtroSec !== 'Todas' && op.seccion !== filtroSec) return false;
+    if (filtroPri !== 'Todas' && op.prioridad !== filtroPri) return false;
+    if (filtroTxt) {
+      const txt = (op.codigo + ' ' + (op.cliente || '')).toLowerCase();
+      if (!txt.includes(filtroTxt)) return false;
+    }
+    return true;
+  });
+
+  lista.sort((a,b) => {
+    if (a.fechaEntrega !== b.fechaEntrega)
+      return (a.fechaEntrega || '').localeCompare(b.fechaEntrega || '');
+    return prioridadValor[a.prioridad] - prioridadValor[b.prioridad];
+  });
+
+  let bloque = null;
+  lista.forEach(op => {
+    if (op.seccion !== bloque) {
+      bloque = op.seccion;
+      const h = document.createElement('div');
+      h.className = "section-title";
+      h.textContent = bloque;
+      cont.appendChild(h);
+    }
+
+    const card = document.createElement('div');
+    card.className = 'op-card';
+    const prioClass = 'tag-prio-' + op.prioridad.toLowerCase();
+
+    card.innerHTML = `
+      <strong>OP:</strong> ${op.codigo}<br>
+      ${op.cliente ? `<strong>Cliente:</strong> ${op.cliente}<br>` : ""}
+      <strong>Fecha entrega:</strong> ${op.fechaEntrega}<br>
+      <span class="tag-seccion">${op.seccion}</span>
+      <span class="tag-prio ${prioClass}">${op.prioridad}</span>
+    `;
+    card.onclick = () => abrirDesdeLista(op.codigo);
+    cont.appendChild(card);
+  });
+
+  if (lista.length === 0) {
+    cont.innerHTML = "<p>No hay órdenes.</p>";
+  }
+}
+
+/* --------- SCAN/EDICIÓN --------- */
+
+function abrirScannerManual() {
+  document.getElementById('scannerSim').style.display = 'block';
+}
+
+function abrirScannerCamara() {
+  alert("Aquí activaremos la cámara cuando la app esté publicada en HTTPS.");
+  document.getElementById('scannerSim').style.display = 'block';
+}
+
+function abrirDesdeLista(codigo) {
+  document.getElementById('scannerSim').style.display = 'block';
+  document.getElementById('codigoInput').value = codigo;
+  simularEscaneo();
+}
+
+let opActual = null;
+
+function simularEscaneo() {
+  const codigo = document.getElementById('codigoInput').value.trim();
+  const res = document.getElementById('resultado');
+  const editor = document.getElementById('editorOP');
+
+  if (!codigo) {
+    res.textContent = "Introduce un código válido";
+    editor.style.display = "none";
+    return;
+  }
+
+  let op = ordenes.find(o => o.codigo === codigo);
+  if (!op) {
+    op = {
+      codigo,
+      cliente:"",
+      seccion:"Corte",
+      fechaEntrega:"",
+      prioridad:"Media",
+      historial:[]
+    };
+    ordenes.push(op);
+    saveOrdenes();
+  }
+
+  opActual = op;
+
+  document.getElementById('opCodigo').textContent = op.codigo;
+  document.getElementById('clienteInput').value = op.cliente;
+  document.getElementById('seccionSelect').value = op.seccion;
+  document.getElementById('fechaEntrega').value = op.fechaEntrega;
+  document.getElementById('prioridadSelect').value = op.prioridad;
+
+  res.textContent = "OP cargada";
+
+  editor.style.display = "block";
+  pintarHistorial();
+}
+
+function guardarOP() {
+  if (!opActual) return;
+
+  const fecha = document.getElementById('fechaEntrega').value;
+  if (!fecha) return alert("La fecha de entrega es obligatoria.");
+
+  const secAnt = opActual.seccion;
+  const prioAnt = opActual.prioridad;
+
+  opActual.cliente = document.getElementById('clienteInput').value.trim();
+  opActual.seccion = document.getElementById('seccionSelect').value;
+  opActual.fechaEntrega = fecha;
+  opActual.prioridad = document.getElementById('prioridadSelect').value;
+
+  const ahora = new Date().toLocaleString();
+  const cambios = [];
+
+  if (secAnt !== opActual.seccion)
+    cambios.push(`Sección: ${secAnt} → ${opActual.seccion}`);
+
+  if (prioAnt !== opActual.prioridad)
+    cambios.push(`Prioridad: ${prioAnt} → ${opActual.prioridad}`);
+
+  if (cambios.length)
+    opActual.historial.push(`${ahora} — ${cambios.join(" | ")}`);
+
+  saveOrdenes();
+  renderOrdenes();
+  pintarHistorial();
+
+  document.getElementById("movimientoResultado").textContent =
+    "OP actualizada correctamente.";
+}
+
+function eliminarOP() {
+  if (!opActual) return;
+  if (!confirm(`¿Eliminar OP ${opActual.codigo}?`)) return;
+
+  ordenes = ordenes.filter(o => o.codigo !== opActual.codigo);
+  saveOrdenes();
+
+  opActual = null;
+
+  document.getElementById("editorOP").style.display = "none";
+  document.getElementById("resultado").textContent = "OP eliminada";
+  document.getElementById("movimientoResultado").textContent = "";
+
+  renderOrdenes();
+}
+
+function pintarHistorial() {
+  const ul = document.getElementById("historialOP");
+  ul.innerHTML = "";
+
+  if (!opActual || !opActual.historial.length) {
+    ul.innerHTML = "<li>No hay movimientos registrados.</li>";
+    return;
+  }
+
+  [...opActual.historial].reverse().forEach(item => {
+    const li = document.createElement("li");
+    li.textContent = item;
+    ul.appendChild(li);
+  });
+}
+
+function toggleHistorial() {
+  const ul = document.getElementById("historialOP");
+  ul.style.display = ul.style.display === "none" ? "block" : "none";
+}
+
+/* ---- REGISTRO DEL SERVICE WORKER ---- */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js");
+  });
+}
+
+/* ---- INICIO ---- */
+window.addEventListener('DOMContentLoaded', () => {
+  loadOrdenes();
+  renderOrdenes();
+});
+</script>
+
+</body>
+</html>
