@@ -1,38 +1,34 @@
-const CACHE_NAME = 'op-app-cache-v1';
+const CACHE_NAME = "gestion-op-cache-v1";
 const URLS_TO_CACHE = [
-  './',
-  './index.html',
-  './manifest.webmanifest'
-  // Si luego añades CSS/JS externos, añádelos aquí.
+  "./",
+  "./index.html",
+  "./manifest.webmanifest",
+  "./icon-192.png",
+  "./icon-512.png"
 ];
 
-self.addEventListener('install', event => {
+self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(URLS_TO_CACHE);
-    })
+    caches.open(CACHE_NAME).then(cache => cache.addAll(URLS_TO_CACHE))
   );
 });
 
-self.addEventListener('activate', event => {
+self.addEventListener("activate", event => {
   event.waitUntil(
-    caches.keys().then(keys => {
-      return Promise.all(
-        keys.map(key => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-        })
-      );
-    })
+    caches.keys().then(keys =>
+      Promise.all(
+        keys
+          .filter(k => k !== CACHE_NAME)
+          .map(k => caches.delete(k))
+      )
+    )
   );
 });
 
-self.addEventListener('fetch', event => {
+self.addEventListener("fetch", event => {
   event.respondWith(
-    caches.match(event.request).then(response => {
-      // Devuelve del caché si existe, si no va a la red
-      return response || fetch(event.request);
+    caches.match(event.request).then(resp => {
+      return resp || fetch(event.request);
     })
   );
 });
