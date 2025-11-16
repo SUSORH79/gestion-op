@@ -1,468 +1,639 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Gestión Producción – OP</title>
+  <meta charset="UTF-8">
+  <title>Gestión OP - Oficina / Seccionadora / Bancos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Necesario para PWA -->
-<meta name="theme-color" content="#1a73e8" />
-<link rel="manifest" href="manifest.webmanifest" />
+  <!-- Estilos básicos -->
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-<style>
- body {
-   font-family: Arial, sans-serif;
-   margin: 0;
-   padding: 0;
-   background:#f2f2f2;
- }
- header {
-   background:#1a73e8;
-   color:white;
-   padding:15px;
-   font-size:20px;
-   text-align:center;
- }
- .container {
-   padding:15px;
- }
- .op-card {
-   background:white;
-   padding:12px 15px;
-   margin-bottom:10px;
-   border-radius:8px;
-   box-shadow:0 1px 3px rgba(0,0,0,0.1);
-   cursor:pointer;
- }
- .op-card:hover {
-   box-shadow:0 2px 6px rgba(0,0,0,0.16);
- }
- .btn {
-   background:#1a73e8;
-   color:white;
-   border:none;
-   padding:8px 12px;
-   border-radius:6px;
-   cursor:pointer;
-   font-size:14px;
- }
- .btn:active {
-   transform: scale(0.97);
- }
- .btn-secondary {
-   background:#6c757d;
- }
- .btn-success {
-   background:#28a745;
- }
- #scannerSim {
-   margin-top:20px;
-   background:white;
-   padding:15px;
-   border-radius:8px;
- }
- .tag-seccion {
-   background:#e0e0e0;
-   padding:2px 6px;
-   border-radius:4px;
-   font-size:12px;
- }
- .tag-prio {
-   padding:2px 6px;
-   border-radius:4px;
-   font-size:12px;
- }
- .tag-prio-alta {
-   background:#e53935;
-   color:white;
- }
- .tag-prio-media {
-   background:#fb8c00;
-   color:white;
- }
- .tag-prio-baja {
-   background:#43a047;
-   color:white;
- }
- .filters {
-   background:white;
-   padding:10px;
-   border-radius:8px;
-   margin-bottom:15px;
-   box-shadow:0 1px 3px rgba(0,0,0,0.08);
-   display:flex;
-   flex-wrap:wrap;
-   gap:8px;
- }
- .filters select,
- .filters input {
-   padding:6px;
-   border-radius:4px;
-   border:1px solid #ccc;
-   font-size:14px;
- }
- .section-title {
-   margin-top:15px;
-   margin-bottom:5px;
-   font-weight:bold;
-   font-size:15px;
-   color:#555;
- }
- .historial-list {
-   margin-top:8px;
-   font-size:12px;
-   color:#444;
- }
- .historial-list li {
-   margin-bottom:4px;
- }
-</style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f2f2f2;
+      color: #333;
+    }
+
+    header {
+      background: #004b7c;
+      color: #fff;
+      padding: 10px 16px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    main {
+      padding: 10px 16px 40px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    h2, h3, h4 {
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .panel {
+      background: #fff;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    /* Formulario alta/edición */
+    form#form-op {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .campo {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    input[type="text"],
+    input[type="date"] {
+      padding: 6px 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 0.9rem;
+    }
+
+    button {
+      border-radius: 4px;
+      border: none;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    button.btn-principal {
+      background: #0069d9;
+      color: #fff;
+    }
+
+    button.btn-secundario {
+      background: #e2e6ea;
+      color: #333;
+    }
+
+    button.btn-peligro {
+      background: #dc3545;
+      color: #fff;
+    }
+
+    button:disabled {
+      background: #ccc;
+      cursor: default;
+    }
+
+    .acciones-form {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    /* Tablero */
+    .board-op {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    @media (min-width: 800px) {
+      .board-op {
+        flex-direction: row;
+      }
+    }
+
+    .columna-op {
+      flex: 1;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 6px;
+      background: #fafafa;
+      min-height: 120px;
+    }
+
+    .columna-op h4 {
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+    }
+
+    .lista-op {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .op-card {
+      border-radius: 4px;
+      padding: 6px;
+      border: 1px solid rgba(0,0,0,0.15);
+      background: #fff;
+      font-size: 0.85rem;
+    }
+
+    .op-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      margin-bottom: 4px;
+      font-size: 0.9rem;
+    }
+
+    .op-card-header span {
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .op-card-detalle {
+      margin-bottom: 4px;
+    }
+
+    .tag-urgencia {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      border: 1px solid rgba(0,0,0,0.12);
+      background: rgba(255,255,255,0.7);
+    }
+
+    .op-card-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .op-card-buttons button {
+      font-size: 0.7rem;
+      padding: 2px 5px;
+    }
+
+    .contador {
+      font-size: 0.8rem;
+      text-align: right;
+      color: #555;
+      margin-top: 4px;
+    }
+
+    .texto-ayuda {
+      font-size: 0.8rem;
+      color: #555;
+      margin-top: 6px;
+    }
+  </style>
 </head>
-
 <body>
-<header>Gestión Producción – Simulación</header>
+<header>
+  <h1>Gestión rápida de OP · Oficina / Seccionadora / Bancos</h1>
+</header>
 
-<div class="container">
+<main>
+  <!-- Formulario OP -->
+  <section class="panel">
+    <h2>Alta / actualización de OP</h2>
+    <p class="texto-ayuda">
+      Rellena los datos y pulsa <strong>Guardar / Actualizar</strong>.  
+      La OP nueva entra siempre por <strong>Oficina</strong>. La <strong>fecha de entrega es obligatoria</strong>.
+    </p>
 
-  <!-- Filtros -->
-  <div class="filters">
-    <select id="filtroSeccion" onchange="renderOrdenes()">
-      <option value="Todas">Todas las secciones</option>
-      <option value="Corte">Corte</option>
-      <option value="Pantógrafos">Pantógrafos</option>
-      <option value="Bancos">Bancos</option>
-      <option value="Barnizado">Barnizado</option>
-      <option value="Montaje">Montaje</option>
-      <option value="Archivo">Archivo</option>
-    </select>
+    <form id="form-op">
+      <div class="campo">
+        <label for="op">OP *</label>
+        <input type="text" id="op" required placeholder="Ej: 2506345">
+      </div>
+      <div class="campo">
+        <label for="descripcion">Descripción mueble</label>
+        <input type="text" id="descripcion" placeholder="Ej: Mueble baño blanco 120 cm">
+      </div>
+      <div class="campo">
+        <label for="cliente">Cliente</label>
+        <input type="text" id="cliente" placeholder="Ej: Reformas López">
+      </div>
+      <div class="campo">
+        <label for="fechaEntrega">Fecha de entrega *</label>
+        <input type="date" id="fechaEntrega" required>
+      </div>
+      <div class="campo acciones-form">
+        <button type="submit" class="btn-principal">Guardar / Actualizar</button>
+        <button type="button" id="btn-limpiar-form" class="btn-secundario">Limpiar formulario</button>
+      </div>
+    </form>
+  </section>
 
-    <select id="filtroPrioridad" onchange="renderOrdenes()">
-      <option value="Todas">Todas las prioridades</option>
-      <option value="Alta">Alta</option>
-      <option value="Media">Media</option>
-      <option value="Baja">Baja</option>
-    </select>
+  <!-- Tablero -->
+  <section class="panel">
+    <h2>Estado de las OP</h2>
+    <p class="texto-ayuda">
+      Colores por urgencia según fecha de entrega. Puedes <strong>subir/bajar</strong> prioridad dentro de cada columna, 
+      <strong>mover</strong> entre Oficina / Seccionadora / Bancos, <strong>editar</strong> y <strong>borrar</strong>.
+    </p>
 
-    <input id="filtroBuscar" placeholder="Buscar por OP o cliente" oninput="renderOrdenes()" />
-
-    <button class="btn btn-secondary" onclick="limpiarFiltros()">Limpiar filtros</button>
-  </div>
-
-  <!-- Lista de órdenes -->
-  <h3>Órdenes de producción</h3>
-  <div id="opList"></div>
-
-  <!-- Métodos de escaneo -->
-  <div style="margin-top:15px; margin-bottom:10px;">
-    <button class="btn" onclick="abrirScannerManual()">Introducir código manual</button>
-    <button class="btn btn-success" style="margin-left:8px;" onclick="abrirScannerCamara()">Escanear con cámara</button>
-  </div>
-
-  <!-- Simulador / Editor -->
-  <div id="scannerSim" style="display:none;">
-    <h3>Escanear / abrir OP</h3>
-    <p>Introduce un código OP:</p>
-
-    <input id="codigoInput" placeholder="Ej: 2505823" style="padding:8px; width:100%;" />
-    <button class="btn" style="margin-top:10px;" onclick="simularEscaneo()">Cargar OP</button>
-
-    <p id="resultado" style="margin-top:15px; font-weight:bold;"></p>
-
-    <!-- Editor -->
-    <div id="editorOP"
-         style="margin-top:15px; display:none; background:#fafafa; padding:10px; border-radius:8px; border:1px solid #ddd;">
-
-      <p><strong>OP actual:</strong> <span id="opCodigo"></span></p>
-
-      <label>Cliente (opcional):</label>
-      <input id="clienteInput" style="padding:8px; width:100%; margin-bottom:8px;" />
-
-      <label>Sección:</label>
-      <select id="seccionSelect" style="padding:8px; width:100%; margin-bottom:8px;">
-        <option value="Corte">Corte</option>
-        <option value="Pantógrafos">Pantógrafos</option>
-        <option value="Bancos">Bancos</option>
-        <option value="Barnizado">Barnizado</option>
-        <option value="Montaje">Montaje</option>
-        <option value="Archivo">Archivo</option>
-      </select>
-
-      <label>Fecha de entrega:</label>
-      <input type="date" id="fechaEntrega" style="padding:8px; width:100%; margin-bottom:8px;" />
-
-      <label>Prioridad:</label>
-      <select id="prioridadSelect" style="padding:8px; width:100%; margin-bottom:8px;">
-        <option value="Alta">Alta</option>
-        <option value="Media" selected>Media</option>
-        <option value="Baja">Baja</option>
-      </select>
-
-      <div style="display:flex; gap:8px; margin-top:5px;">
-        <button class="btn" onclick="guardarOP()">Guardar / Actualizar</button>
-        <button class="btn btn-secondary" onclick="toggleHistorial()">Historial</button>
-        <button class="btn" style="background:#dc3545" onclick="eliminarOP()">Eliminar</button>
+    <div class="board-op">
+      <div class="columna-op" data-seccion="Oficina">
+        <h4>Oficina</h4>
+        <div id="col-oficina" class="lista-op"></div>
+        <div id="count-oficina" class="contador"></div>
       </div>
 
-      <ul id="historialOP" class="historial-list" style="display:none;"></ul>
-      <p id="movimientoResultado" style="margin-top:10px; font-weight:bold;"></p>
+      <div class="columna-op" data-seccion="Seccionadora">
+        <h4>Seccionadora</h4>
+        <div id="col-seccionadora" class="lista-op"></div>
+        <div id="count-seccionadora" class="contador"></div>
+      </div>
+
+      <div class="columna-op" data-seccion="Bancos">
+        <h4>Bancos</h4>
+        <div id="col-bancos" class="lista-op"></div>
+        <div id="count-bancos" class="contador"></div>
+      </div>
     </div>
-  </div>
-</div>
+  </section>
+</main>
 
-<!-- =============================
-     LÓGICA JAVASCRIPT DE LA APP
-     ============================= -->
-
+<!-- Lógica -->
 <script>
-/* ------- PERSISTENCIA LOCAL -------- */
-const STORAGE_KEY = 'op_app_ordenes_v1';
-let ordenes = [];
+  // ==============================
+  //  Datos base y utilidades
+  // ==============================
+  const STORAGE_KEY = 'ops_produccion_v2';
 
-function loadOrdenes() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return;
-    const data = JSON.parse(raw);
-    if (Array.isArray(data)) ordenes = data;
-  } catch(e) { console.error(e); }
-}
+  let ops = [];
 
-function saveOrdenes() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(ordenes));
-}
-
-/* --------- UTILIDADES --------- */
-
-function limpiarFiltros() {
-  document.getElementById('filtroSeccion').value = 'Todas';
-  document.getElementById('filtroPrioridad').value = 'Todas';
-  document.getElementById('filtroBuscar').value = '';
-  renderOrdenes();
-}
-
-/* Limpieza automática para Archivo */
-function limpiarAntiguas() {
-  const ahora = new Date();
-  const DIA = 86400000;
-
-  const paraBorrar = ordenes.filter(op => {
-    if (op.seccion !== "Archivo") return false;
-    if (!op.fechaEntrega) return false;
-    const f = new Date(op.fechaEntrega);
-    if (isNaN(f)) return false;
-    return (ahora - f) / DIA >= 15;
-  }).map(op => op.codigo);
-
-  if (paraBorrar.length > 0) {
-    if (confirm(`Hay ${paraBorrar.length} OP en ARCHIVO con más de 15 días. ¿Borrarlas?`)) {
-      ordenes = ordenes.filter(o => !paraBorrar.includes(o.codigo));
-      saveOrdenes();
+  function cargarOps() {
+    try {
+      const texto = localStorage.getItem(STORAGE_KEY);
+      if (!texto) {
+        ops = [];
+        return;
+      }
+      const parsed = JSON.parse(texto);
+      if (!Array.isArray(parsed)) {
+        ops = [];
+        return;
+      }
+      // Normalizamos estructura
+      ops = parsed.map((op, index) => ({
+        op: op.op || '',
+        descripcion: op.descripcion || '',
+        cliente: op.cliente || '',
+        fechaEntrega: op.fechaEntrega || '',
+        seccion: op.seccion || 'Oficina',
+        orden: (typeof op.orden === 'number') ? op.orden : (index + 1)
+      }));
+    } catch (e) {
+      console.error('Error al leer ops de localStorage', e);
+      ops = [];
     }
   }
-}
 
-/* ---------- RENDER DEL TABLERO ---------- */
-
-function renderOrdenes() {
-  limpiarAntiguas();
-
-  const cont = document.getElementById('opList');
-  cont.innerHTML = '';
-
-  const filtroSec = document.getElementById('filtroSeccion').value;
-  const filtroPri = document.getElementById('filtroPrioridad').value;
-  const filtroTxt = document.getElementById('filtroBuscar').value.toLowerCase();
-
-  const prioridadValor = { Alta:1, Media:2, Baja:3 };
-
-  let lista = ordenes.filter(op => {
-    if (filtroSec !== 'Todas' && op.seccion !== filtroSec) return false;
-    if (filtroPri !== 'Todas' && op.prioridad !== filtroPri) return false;
-    if (filtroTxt) {
-      const txt = (op.codigo + ' ' + (op.cliente || '')).toLowerCase();
-      if (!txt.includes(filtroTxt)) return false;
-    }
-    return true;
-  });
-
-  lista.sort((a,b) => {
-    if (a.fechaEntrega !== b.fechaEntrega)
-      return (a.fechaEntrega || '').localeCompare(b.fechaEntrega || '');
-    return prioridadValor[a.prioridad] - prioridadValor[b.prioridad];
-  });
-
-  let bloque = null;
-  lista.forEach(op => {
-    if (op.seccion !== bloque) {
-      bloque = op.seccion;
-      const h = document.createElement('div');
-      h.className = "section-title";
-      h.textContent = bloque;
-      cont.appendChild(h);
-    }
-
-    const card = document.createElement('div');
-    card.className = 'op-card';
-    const prioClass = 'tag-prio-' + op.prioridad.toLowerCase();
-
-    card.innerHTML = `
-      <strong>OP:</strong> ${op.codigo}<br>
-      ${op.cliente ? `<strong>Cliente:</strong> ${op.cliente}<br>` : ""}
-      <strong>Fecha entrega:</strong> ${op.fechaEntrega}<br>
-      <span class="tag-seccion">${op.seccion}</span>
-      <span class="tag-prio ${prioClass}">${op.prioridad}</span>
-    `;
-    card.onclick = () => abrirDesdeLista(op.codigo);
-    cont.appendChild(card);
-  });
-
-  if (lista.length === 0) {
-    cont.innerHTML = "<p>No hay órdenes.</p>";
-  }
-}
-
-/* --------- SCAN/EDICIÓN --------- */
-
-function abrirScannerManual() {
-  document.getElementById('scannerSim').style.display = 'block';
-}
-
-function abrirScannerCamara() {
-  alert("Aquí activaremos la cámara cuando la app esté publicada en HTTPS.");
-  document.getElementById('scannerSim').style.display = 'block';
-}
-
-function abrirDesdeLista(codigo) {
-  document.getElementById('scannerSim').style.display = 'block';
-  document.getElementById('codigoInput').value = codigo;
-  simularEscaneo();
-}
-
-let opActual = null;
-
-function simularEscaneo() {
-  const codigo = document.getElementById('codigoInput').value.trim();
-  const res = document.getElementById('resultado');
-  const editor = document.getElementById('editorOP');
-
-  if (!codigo) {
-    res.textContent = "Introduce un código válido";
-    editor.style.display = "none";
-    return;
+  function guardarOps() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(ops));
   }
 
-  let op = ordenes.find(o => o.codigo === codigo);
-  if (!op) {
-    op = {
-      codigo,
-      cliente:"",
-      seccion:"Corte",
-      fechaEntrega:"",
-      prioridad:"Media",
-      historial:[]
+  function obtenerSiguienteOrden(seccion) {
+    const lista = ops.filter(o => o.seccion === seccion);
+    if (lista.length === 0) return 1;
+    const maxOrden = Math.max(...lista.map(o => o.orden || 0));
+    return maxOrden + 1;
+  }
+
+  // Diferencia en días entre hoy y fechaEntrega
+  function diasHasta(fechaTexto) {
+    if (!fechaTexto) return null;
+    const hoy = new Date();
+    const fecha = new Date(fechaTexto + 'T00:00:00');
+    const diffMs = fecha - hoy;
+    const diffDias = Math.round(diffMs / (1000 * 60 * 60 * 24));
+    return diffDias;
+  }
+
+  // Color de fondo por urgencia
+  function colorPorUrgencia(fechaTexto) {
+    const d = diasHasta(fechaTexto);
+    if (d === null) return '#ffffff';
+
+    if (d < 0) return '#ffcccc';     // vencida
+    if (d <= 2) return '#ffe0cc';    // muy urgente
+    if (d <= 7) return '#fff3cd';    // próxima
+    return '#d4edda';                // holgado
+  }
+
+  // Texto etiqueta urgencia
+  function textoUrgencia(fechaTexto) {
+    const d = diasHasta(fechaTexto);
+    if (d === null) return 'Sin fecha';
+
+    if (d < 0) {
+      const abs = Math.abs(d);
+      return `Vencida hace ${abs} día${abs === 1 ? '' : 's'}`;
+    }
+    if (d === 0) return 'Entrega hoy';
+    if (d === 1) return 'Entrega mañana';
+    return `Entrega en ${d} día${d === 1 ? '' : 's'}`;
+  }
+
+  // ==============================
+  //  CRUD de OP
+  // ==============================
+  function upsertOP(datos) {
+    const idx = ops.findIndex(o => o.op === datos.op);
+    if (idx === -1) {
+      // Nueva OP
+      const nueva = {
+        op: datos.op,
+        descripcion: datos.descripcion || '',
+        cliente: datos.cliente || '',
+        fechaEntrega: datos.fechaEntrega,
+        seccion: 'Oficina',
+        orden: obtenerSiguienteOrden('Oficina')
+      };
+      ops.push(nueva);
+    } else {
+      // Actualizar OP existente manteniendo sección y orden
+      const existente = ops[idx];
+      existente.descripcion = datos.descripcion || '';
+      existente.cliente = datos.cliente || '';
+      existente.fechaEntrega = datos.fechaEntrega;
+    }
+    guardarOps();
+    renderBoardOP();
+  }
+
+  function borrarOP(codOp) {
+    const op = ops.find(o => o.op === codOp);
+    if (!op) return;
+    const ok = confirm(`¿Seguro que quieres borrar la OP ${codOp}?`);
+    if (!ok) return;
+    ops = ops.filter(o => o.op !== codOp);
+    guardarOps();
+    renderBoardOP();
+  }
+
+  function moverOP(codOp, nuevaSeccion) {
+    const op = ops.find(o => o.op === codOp);
+    if (!op) return;
+    op.seccion = nuevaSeccion;
+    op.orden = obtenerSiguienteOrden(nuevaSeccion);
+    guardarOps();
+    renderBoardOP();
+  }
+
+  function subirOP(codOp) {
+    const op = ops.find(o => o.op === codOp);
+    if (!op) return;
+
+    const mismaSeccion = ops
+      .filter(o => o.seccion === op.seccion)
+      .sort((a, b) => a.orden - b.orden);
+
+    const index = mismaSeccion.findIndex(o => o.op === codOp);
+    if (index <= 0) return;
+
+    const opArriba = mismaSeccion[index - 1];
+    const temp = op.orden;
+    op.orden = opArriba.orden;
+    opArriba.orden = temp;
+
+    guardarOps();
+    renderBoardOP();
+  }
+
+  function bajarOP(codOp) {
+    const op = ops.find(o => o.op === codOp);
+    if (!op) return;
+
+    const mismaSeccion = ops
+      .filter(o => o.seccion === op.seccion)
+      .sort((a, b) => a.orden - b.orden);
+
+    const index = mismaSeccion.findIndex(o => o.op === codOp);
+    if (index === -1 || index >= mismaSeccion.length - 1) return;
+
+    const opAbajo = mismaSeccion[index + 1];
+    const temp = op.orden;
+    op.orden = opAbajo.orden;
+    opAbajo.orden = temp;
+
+    guardarOps();
+    renderBoardOP();
+  }
+
+  function editarOP(codOp) {
+    const op = ops.find(o => o.op === codOp);
+    if (!op) return;
+
+    const nuevaDesc = prompt('Descripción mueble:', op.descripcion || '');
+    if (nuevaDesc === null) return;
+
+    const nuevoCliente = prompt('Cliente:', op.cliente || '');
+    if (nuevoCliente === null) return;
+
+    const nuevaFecha = prompt('Fecha entrega (YYYY-MM-DD):', op.fechaEntrega || '');
+    if (nuevaFecha === null || !nuevaFecha.trim()) {
+      alert('La fecha de entrega es obligatoria');
+      return;
+    }
+
+    op.descripcion = nuevaDesc.trim();
+    op.cliente = nuevoCliente.trim();
+    op.fechaEntrega = nuevaFecha.trim();
+
+    guardarOps();
+    renderBoardOP();
+  }
+
+  // ==============================
+  //  Limpieza automática >15 días
+  // ==============================
+  function limpiarOPAntiguas() {
+    const hoy = new Date();
+    const candidatos = ops.filter(op => {
+      if (!op.fechaEntrega) return false;
+      const fecha = new Date(op.fechaEntrega + 'T00:00:00');
+      const diffMs = hoy - fecha;
+      const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      return diffDias > 15;
+    });
+
+    if (candidatos.length === 0) return;
+
+    const ok = confirm(
+      `Hay ${candidatos.length} OP con fecha de entrega de hace más de 15 días.\n` +
+      `¿Quieres borrarlas automáticamente?`
+    );
+    if (!ok) return;
+
+    const ids = new Set(candidatos.map(c => c.op));
+    ops = ops.filter(o => !ids.has(o.op));
+    guardarOps();
+    renderBoardOP();
+  }
+
+  // ==============================
+  //  Render tablero
+  // ==============================
+  function botonesMovimientoHTML(op) {
+    if (op.seccion === 'Oficina') {
+      return `<button onclick="moverOP('${op.op}', 'Seccionadora')">▶ A Seccionadora</button>`;
+    }
+    if (op.seccion === 'Seccionadora') {
+      return `
+        <button onclick="moverOP('${op.op}', 'Oficina')">◀ A Oficina</button>
+        <button onclick="moverOP('${op.op}', 'Bancos')">▶ A Bancos</button>
+      `;
+    }
+    if (op.seccion === 'Bancos') {
+      return `<button onclick="moverOP('${op.op}', 'Seccionadora')">◀ A Seccionadora</button>`;
+    }
+    return '';
+  }
+
+  function renderBoardOP() {
+    const colOficina = document.getElementById('col-oficina');
+    const colSeccionadora = document.getElementById('col-seccionadora');
+    const colBancos = document.getElementById('col-bancos');
+    const countOficina = document.getElementById('count-oficina');
+    const countSeccionadora = document.getElementById('count-seccionadora');
+    const countBancos = document.getElementById('count-bancos');
+
+    if (!colOficina || !colSeccionadora || !colBancos) return;
+
+    colOficina.innerHTML = '';
+    colSeccionadora.innerHTML = '';
+    colBancos.innerHTML = '';
+
+    const secciones = ['Oficina', 'Seccionadora', 'Bancos'];
+    const contadores = {
+      'Oficina': 0,
+      'Seccionadora': 0,
+      'Bancos': 0
     };
-    ordenes.push(op);
-    saveOrdenes();
+
+    secciones.forEach(seccion => {
+      const lista = ops
+        .filter(op => op.seccion === seccion)
+        .sort((a, b) => (a.orden || 0) - (b.orden || 0));
+
+      lista.forEach(op => {
+        contadores[seccion]++;
+
+        const card = document.createElement('div');
+        card.className = 'op-card';
+        card.style.backgroundColor = colorPorUrgencia(op.fechaEntrega);
+
+        const etiqueta = textoUrgencia(op.fechaEntrega);
+
+        card.innerHTML = `
+          <div class="op-card-header">
+            <div>OP: ${op.op}</div>
+            <span class="tag-urgencia">${etiqueta}</span>
+          </div>
+          <div class="op-card-detalle">
+            <div><strong>Mueble:</strong> ${op.descripcion || '-'}</div>
+            <div><strong>Cliente:</strong> ${op.cliente || '-'}</div>
+            <div><strong>Entrega:</strong> ${op.fechaEntrega || '-'}</div>
+          </div>
+          <div class="op-card-buttons">
+            <button onclick="subirOP('${op.op}')">▲</button>
+            <button onclick="bajarOP('${op.op}')">▼</button>
+            ${botonesMovimientoHTML(op)}
+            <button onclick="editarOP('${op.op}')">Editar</button>
+            <button class="btn-peligro" onclick="borrarOP('${op.op}')">Borrar</button>
+          </div>
+        `;
+
+        if (seccion === 'Oficina') colOficina.appendChild(card);
+        if (seccion === 'Seccionadora') colSeccionadora.appendChild(card);
+        if (seccion === 'Bancos') colBancos.appendChild(card);
+      });
+    });
+
+    countOficina.textContent = `Total: ${contadores['Oficina']}`;
+    countSeccionadora.textContent = `Total: ${contadores['Seccionadora']}`;
+    countBancos.textContent = `Total: ${contadores['Bancos']}`;
   }
 
-  opActual = op;
+  // ==============================
+  //  Formulario
+  // ==============================
+  function initFormulario() {
+    const form = document.getElementById('form-op');
+    const inputOP = document.getElementById('op');
+    const inputDesc = document.getElementById('descripcion');
+    const inputCliente = document.getElementById('cliente');
+    const inputFecha = document.getElementById('fechaEntrega');
+    const btnLimpiar = document.getElementById('btn-limpiar-form');
 
-  document.getElementById('opCodigo').textContent = op.codigo;
-  document.getElementById('clienteInput').value = op.cliente;
-  document.getElementById('seccionSelect').value = op.seccion;
-  document.getElementById('fechaEntrega').value = op.fechaEntrega;
-  document.getElementById('prioridadSelect').value = op.prioridad;
+    if (!form) return;
 
-  res.textContent = "OP cargada";
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const op = (inputOP.value || '').trim();
+      const descripcion = (inputDesc.value || '').trim();
+      const cliente = (inputCliente.value || '').trim();
+      const fechaEntrega = (inputFecha.value || '').trim();
 
-  editor.style.display = "block";
-  pintarHistorial();
-}
+      if (!op) {
+        alert('La OP es obligatoria');
+        return;
+      }
+      if (!fechaEntrega) {
+        alert('La fecha de entrega es obligatoria');
+        return;
+      }
 
-function guardarOP() {
-  if (!opActual) return;
+      upsertOP({ op, descripcion, cliente, fechaEntrega });
+      form.reset();
+      inputOP.focus();
+    });
 
-  const fecha = document.getElementById('fechaEntrega').value;
-  if (!fecha) return alert("La fecha de entrega es obligatoria.");
-
-  const secAnt = opActual.seccion;
-  const prioAnt = opActual.prioridad;
-
-  opActual.cliente = document.getElementById('clienteInput').value.trim();
-  opActual.seccion = document.getElementById('seccionSelect').value;
-  opActual.fechaEntrega = fecha;
-  opActual.prioridad = document.getElementById('prioridadSelect').value;
-
-  const ahora = new Date().toLocaleString();
-  const cambios = [];
-
-  if (secAnt !== opActual.seccion)
-    cambios.push(`Sección: ${secAnt} → ${opActual.seccion}`);
-
-  if (prioAnt !== opActual.prioridad)
-    cambios.push(`Prioridad: ${prioAnt} → ${opActual.prioridad}`);
-
-  if (cambios.length)
-    opActual.historial.push(`${ahora} — ${cambios.join(" | ")}`);
-
-  saveOrdenes();
-  renderOrdenes();
-  pintarHistorial();
-
-  document.getElementById("movimientoResultado").textContent =
-    "OP actualizada correctamente.";
-}
-
-function eliminarOP() {
-  if (!opActual) return;
-  if (!confirm(`¿Eliminar OP ${opActual.codigo}?`)) return;
-
-  ordenes = ordenes.filter(o => o.codigo !== opActual.codigo);
-  saveOrdenes();
-
-  opActual = null;
-
-  document.getElementById("editorOP").style.display = "none";
-  document.getElementById("resultado").textContent = "OP eliminada";
-  document.getElementById("movimientoResultado").textContent = "";
-
-  renderOrdenes();
-}
-
-function pintarHistorial() {
-  const ul = document.getElementById("historialOP");
-  ul.innerHTML = "";
-
-  if (!opActual || !opActual.historial.length) {
-    ul.innerHTML = "<li>No hay movimientos registrados.</li>";
-    return;
+    btnLimpiar.addEventListener('click', () => {
+      form.reset();
+      inputOP.focus();
+    });
   }
 
-  [...opActual.historial].reverse().forEach(item => {
-    const li = document.createElement("li");
-    li.textContent = item;
-    ul.appendChild(li);
+  // ==============================
+  //  Inicio
+  // ==============================
+  window.addEventListener('load', () => {
+    cargarOps();
+    limpiarOPAntiguas(); // pregunta si quieres borrar las muy viejas
+    renderBoardOP();
+    initFormulario();
   });
-}
 
-function toggleHistorial() {
-  const ul = document.getElementById("historialOP");
-  ul.style.display = ul.style.display === "none" ? "block" : "none";
-}
-
-/* ---- REGISTRO DEL SERVICE WORKER ---- */
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("service-worker.js");
-  });
-}
-
-/* ---- INICIO ---- */
-window.addEventListener('DOMContentLoaded', () => {
-  loadOrdenes();
-  renderOrdenes();
-});
+  // Exponer funciones al global para los onclick
+  window.moverOP = moverOP;
+  window.subirOP = subirOP;
+  window.bajarOP = bajarOP;
+  window.editarOP = editarOP;
+  window.borrarOP = borrarOP;
 </script>
-
 </body>
 </html>
+
