@@ -67,24 +67,8 @@
     padding:2px 6px;
     border-radius:4px;
     font-size:11px;
-    margin-right:4px;
-  }
-  .tag-prio {
-    padding:2px 6px;
-    border-radius:4px;
-    font-size:11px;
-  }
-  .tag-prio-alta {
-    background:#e53935;
-    color:white;
-  }
-  .tag-prio-media {
-    background:#fb8c00;
-    color:white;
-  }
-  .tag-prio-baja {
-    background:#43a047;
-    color:white;
+    margin-top:4px;
+    display:inline-block;
   }
   .filters {
     background:white;
@@ -103,6 +87,7 @@
     border:1px solid #ccc;
     font-size:13px;
     flex:1 1 45%;
+    box-sizing:border-box;
   }
   .filters button {
     flex:1 1 100%;
@@ -159,13 +144,6 @@
       <option value="Archivo">Archivo</option>
     </select>
 
-    <select id="filtroPrioridad" onchange="renderOrdenes()">
-      <option value="Todas">Todas las prioridades</option>
-      <option value="Alta">Alta</option>
-      <option value="Media">Media</option>
-      <option value="Baja">Baja</option>
-    </select>
-
     <input id="filtroOP" placeholder="Filtrar por OP" oninput="renderOrdenes()" />
     <input id="filtroCliente" placeholder="Filtrar por cliente" oninput="renderOrdenes()" />
 
@@ -202,6 +180,9 @@
       <label style="font-size:13px;">Cliente (opcional):</label>
       <input id="clienteInput" style="padding:8px; width:100%; margin-bottom:6px;" />
 
+      <label style="font-size:13px;">Mueble / descripción:</label>
+      <input id="muebleInput" style="padding:8px; width:100%; margin-bottom:6px;" />
+
       <label style="font-size:13px;">Sección:</label>
       <select id="seccionSelect" style="padding:8px; width:100%; margin-bottom:6px;">
         <option value="Corte">Corte</option>
@@ -214,13 +195,6 @@
 
       <label style="font-size:13px;">Fecha de entrega (obligatoria):</label>
       <input type="date" id="fechaEntrega" style="padding:8px; width:100%; margin-bottom:6px;" />
-
-      <label style="font-size:13px;">Prioridad:</label>
-      <select id="prioridadSelect" style="padding:8px; width:100%; margin-bottom:6px;">
-        <option value="Alta">Alta</option>
-        <option value="Media" selected>Media</option>
-        <option value="Baja">Baja</option>
-      </select>
 
       <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:4px;">
         <button class="btn" style="flex:1;" onclick="guardarOP()">Guardar</button>
@@ -262,7 +236,6 @@ function saveOrdenes() {
 /* ===== FILTROS ===== */
 function limpiarFiltros() {
   document.getElementById('filtroSeccion').value  = 'Todas';
-  document.getElementById('filtroPrioridad').value = 'Todas';
   document.getElementById('filtroOP').value       = '';
   document.getElementById('filtroCliente').value  = '';
   renderOrdenes();
@@ -277,7 +250,7 @@ function limpiarAntiguas() {
   ordenes.forEach(op => {
     if (op.seccion !== 'Archivo') return;
     if (!op.fechaEntrega) return;
-    const f = new Date(op.fechaEntrega);
+    const f = new Date(op.fechaEntrega + 'T00:00:00');
     if (isNaN(f)) return;
     const diffDias = (ahora - f) / DIA;
     if (diffDias >= 15) {
@@ -303,15 +276,11 @@ function renderOrdenes() {
   cont.innerHTML = '';
 
   const filtroSec     = document.getElementById('filtroSeccion').value;
-  const filtroPri     = document.getElementById('filtroPrioridad').value;
   const filtroOP      = document.getElementById('filtroOP').value.trim().toLowerCase();
   const filtroCliente = document.getElementById('filtroCliente').value.trim().toLowerCase();
 
-  const prioridadValor = { Alta:1, Media:2, Baja:3 };
-
   let lista = ordenes.filter(op => {
     if (filtroSec !== 'Todas' && op.seccion !== filtroSec) return false;
-    if (filtroPri !== 'Todas' && op.prioridad !== filtroPri) return false;
 
     if (filtroOP) {
       const txtOp = (op.codigo || '').toLowerCase();
@@ -326,7 +295,7 @@ function renderOrdenes() {
     return true;
   });
 
-  // Ordenar: fecha más cercana primero, sin fecha al final; luego prioridad
+  // Ordenar: fecha más cercana primero, sin fecha al final; luego por código de OP
   lista.sort((a, b) => {
     const fa = a.fechaEntrega || '';
     const fb = b.fechaEntrega || '';
@@ -335,12 +304,12 @@ function renderOrdenes() {
     if (fa && !fb) return -1;
 
     if (fa && fb && fa !== fb) {
-      return fa.localeCompare(fb); // YYYY-MM-DD → orden correcto
+      return fa.localeCompare(fb); // YYYY-MM-DD
     }
 
-    const pa = prioridadValor[a.prioridad] || 99;
-    const pb = prioridadValor[b.prioridad] || 99;
-    return pa - pb;
+    const ca = (a.codigo || '').toLowerCase();
+    const cb = (b.codigo || '').toLowerCase();
+    return ca.localeCompare(cb);
   });
 
   let seccionActual = null;
@@ -356,9 +325,6 @@ function renderOrdenes() {
 
     const card = document.createElement('div');
     card.className = 'op-card';
-
-    const prioridad = op.prioridad || 'Media';
-    const prioClass = 'tag-prio-' + prioridad.toLowerCase();
 
     // Cálculo de días restantes
     const MS_DAY = 24 * 60 * 60 * 1000;
@@ -380,9 +346,9 @@ function renderOrdenes() {
     card.innerHTML = `
       <strong>OP:</strong> ${op.codigo}<br>
       ${op.cliente ? `<strong>Cliente:</strong> ${op.cliente}<br>` : ""}
+      ${op.mueble ? `<strong>Mueble:</strong> ${op.mueble}<br>` : ""}
       <strong>Fecha entrega:</strong> ${op.fechaEntrega || '-'}${badgeHtml ? ' ' + badgeHtml : ''}<br>
       <span class="tag-seccion">${op.seccion}</span>
-      <span class="tag-prio ${prioClass}">${prioridad}</span>
     `;
     card.onclick = () => abrirDesdeLista(op.codigo);
     cont.appendChild(card);
@@ -399,7 +365,6 @@ function abrirScannerManual() {
 }
 
 function abrirScannerCamara() {
-  // Cuando trabajemos con lector real de códigos, aquí activaremos la cámara.
   alert('Modo cámara simulado. Más adelante conectaremos con la cámara real.');
   document.getElementById('scannerSim').style.display = 'block';
 }
@@ -428,9 +393,9 @@ function simularEscaneo() {
     op = {
       codigo,
       cliente: '',
+      mueble: '',
       seccion: 'Corte',
       fechaEntrega: '',
-      prioridad: 'Media',
       historial: []
     };
     ordenes.push(op);
@@ -441,9 +406,9 @@ function simularEscaneo() {
 
   document.getElementById('opCodigo').textContent   = op.codigo;
   document.getElementById('clienteInput').value     = op.cliente || '';
+  document.getElementById('muebleInput').value      = op.mueble || '';
   document.getElementById('seccionSelect').value    = op.seccion || 'Corte';
   document.getElementById('fechaEntrega').value     = op.fechaEntrega || '';
-  document.getElementById('prioridadSelect').value  = op.prioridad || 'Media';
 
   res.textContent = `OP ${codigo} cargada.`;
   editor.style.display = 'block';
@@ -460,13 +425,13 @@ function guardarOP() {
     return;
   }
 
-  const seccionAnterior   = opActual.seccion;
-  const prioridadAnterior = opActual.prioridad;
+  const seccionAnterior = opActual.seccion;
+  const muebleAnterior  = opActual.mueble || '';
 
   opActual.cliente      = document.getElementById('clienteInput').value.trim();
+  opActual.mueble       = document.getElementById('muebleInput').value.trim();
   opActual.seccion      = document.getElementById('seccionSelect').value;
   opActual.fechaEntrega = fecha;
-  opActual.prioridad    = document.getElementById('prioridadSelect').value;
 
   const marcaTiempo = new Date().toLocaleString();
   const cambios = [];
@@ -474,8 +439,8 @@ function guardarOP() {
   if (seccionAnterior !== opActual.seccion) {
     cambios.push(`Sección: ${seccionAnterior || 'Sin'} → ${opActual.seccion}`);
   }
-  if (prioridadAnterior !== opActual.prioridad) {
-    cambios.push(`Prioridad: ${prioridadAnterior || 'Sin'} → ${opActual.prioridad}`);
+  if (muebleAnterior !== opActual.mueble) {
+    cambios.push(`Mueble: ${muebleAnterior || 'Sin'} → ${opActual.mueble || 'Sin'}`);
   }
 
   if (cambios.length > 0) {
@@ -488,7 +453,7 @@ function guardarOP() {
   pintarHistorial();
 
   document.getElementById('movimientoResultado').textContent =
-    `OP ${opActual.codigo} guardada en sección ${opActual.seccion} con prioridad ${opActual.prioridad}.`;
+    `OP ${opActual.codigo} guardada en sección ${opActual.seccion}.`;
 }
 
 function eliminarOP() {
