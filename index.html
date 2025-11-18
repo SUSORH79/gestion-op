@@ -127,7 +127,15 @@
   input, select {
     box-sizing:border-box;
   }
+  #cameraArea video {
+    width:100%;
+    border-radius:8px;
+    background:black;
+  }
 </style>
+
+<!-- Librería de lectura de códigos de barras (ZXing) -->
+<script src="https://unpkg.com/@zxing/library@latest"></script>
 </head>
 
 <body>
@@ -171,6 +179,14 @@
     <input id="codigoInput" placeholder="Ej: 2505823"
            style="padding:8px; width:100%; margin-bottom:6px;" />
     <button class="btn" style="margin-bottom:8px;" onclick="simularEscaneo()">Cargar OP</button>
+
+    <!-- Zona cámara -->
+    <div id="cameraArea" style="display:none; margin-top:8px;">
+      <video id="videoPreview" autoplay muted playsinline></video>
+      <button class="btn btn-secondary" style="margin-top:6px;" type="button" onclick="pararCamara()">
+        Cerrar cámara
+      </button>
+    </div>
 
     <p id="resultado" style="margin-top:4px; font-weight:bold;"></p>
 
@@ -216,6 +232,9 @@
 const STORAGE_KEY = 'op_app_ordenes_v1';
 let ordenes = [];
 let opActual = null;
+
+/* ZXing lector */
+let codeReader = null;
 
 function loadOrdenes() {
   try {
@@ -368,20 +387,52 @@ function renderOrdenes() {
 /* ===== ESCANEO / EDICIÓN ===== */
 function abrirScannerManual() {
   document.getElementById('scannerSim').style.display = 'block';
+  pararCamara();
   const input = document.getElementById('codigoInput');
   input.focus();
 }
 
 function abrirScannerCamara() {
-  // De momento abre el panel de escaneo; más adelante se puede integrar lector real
   document.getElementById('scannerSim').style.display = 'block';
-  const input = document.getElementById('codigoInput');
-  input.focus();
+  iniciarCamara();
+}
+
+/* Iniciar / parar cámara con ZXing */
+function iniciarCamara() {
+  const cameraArea = document.getElementById('cameraArea');
+  cameraArea.style.display = 'block';
+
+  if (!codeReader) {
+    codeReader = new ZXing.BrowserBarcodeReader();
+  }
+
+  codeReader.decodeFromVideoDevice(null, 'videoPreview', (result, err) => {
+    if (result) {
+      const codigo = result.getText();
+      document.getElementById('codigoInput').value = codigo;
+      pararCamara();
+      simularEscaneo();
+    }
+    // errores de lectura se ignoran, la cámara sigue intentándolo
+  }).catch(err => {
+    console.error(err);
+    alert('No se puede acceder a la cámara. Revisa permisos del navegador.');
+    pararCamara();
+  });
+}
+
+function pararCamara() {
+  const cameraArea = document.getElementById('cameraArea');
+  cameraArea.style.display = 'none';
+  if (codeReader) {
+    codeReader.reset();
+  }
 }
 
 function abrirDesdeLista(codigo) {
   document.getElementById('scannerSim').style.display = 'block';
   document.getElementById('codigoInput').value = codigo;
+  pararCamara();
   simularEscaneo();
 }
 
