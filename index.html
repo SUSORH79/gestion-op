@@ -9,131 +9,141 @@
 <link rel="manifest" href="manifest.webmanifest" />
 
 <style>
- body {
-   font-family: Arial, sans-serif;
-   margin: 0;
-   padding: 0;
-   background:#f2f2f2;
- }
- header {
-   background:#1a73e8;
-   color:white;
-   padding:15px;
-   font-size:20px;
-   text-align:center;
- }
- .container {
-   padding:15px;
- }
- .op-card {
-   background:white;
-   padding:12px 15px;
-   margin-bottom:10px;
-   border-radius:8px;
-   box-shadow:0 1px 3px rgba(0,0,0,0.1);
-   cursor:pointer;
- }
- .op-card:hover {
-   box-shadow:0 2px 6px rgba(0,0,0,0.16);
- }
- .btn {
-   background:#1a73e8;
-   color:white;
-   border:none;
-   padding:8px 12px;
-   border-radius:6px;
-   cursor:pointer;
-   font-size:14px;
- }
- .btn:active {
-   transform: scale(0.97);
- }
- .btn-secondary {
-   background:#6c757d;
- }
- .btn-success {
-   background:#28a745;
- }
- #scannerSim {
-   margin-top:20px;
-   background:white;
-   padding:15px;
-   border-radius:8px;
- }
- .tag-seccion {
-   background:#e0e0e0;
-   padding:2px 6px;
-   border-radius:4px;
-   font-size:12px;
- }
- .tag-prio {
-   padding:2px 6px;
-   border-radius:4px;
-   font-size:12px;
- }
- .tag-prio-alta {
-   background:#e53935;
-   color:white;
- }
- .tag-prio-media {
-   background:#fb8c00;
-   color:white;
- }
- .tag-prio-baja {
-   background:#43a047;
-   color:white;
- }
- .filters {
-   background:white;
-   padding:10px;
-   border-radius:8px;
-   margin-bottom:15px;
-   box-shadow:0 1px 3px rgba(0,0,0,0.08);
-   display:flex;
-   flex-wrap:wrap;
-   gap:8px;
- }
- .filters select,
- .filters input {
-   padding:6px;
-   border-radius:4px;
-   border:1px solid #ccc;
-   font-size:14px;
- }
- .section-title {
-   margin-top:15px;
-   margin-bottom:5px;
-   font-weight:bold;
-   font-size:15px;
-   color:#555;
- }
- .historial-list {
-   margin-top:8px;
-   font-size:12px;
-   color:#444;
- }
- .historial-list li {
-   margin-bottom:4px;
- }
- .due-badge {
-   padding:2px 6px;
-   border-radius:4px;
-   font-size:12px;
-   margin-left:6px;
- }
- .due-red {
-   background:#e53935;
-   color:white;
- }
- .due-orange {
-   background:#fb8c00;
-   color:white;
- }
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background:#f2f2f2;
+  }
+  header {
+    background:#1a73e8;
+    color:white;
+    padding:12px;
+    font-size:18px;
+    text-align:center;
+  }
+  .container {
+    padding:10px;
+    max-width:600px;
+    margin:0 auto;
+  }
+  .op-card {
+    background:white;
+    padding:10px 12px;
+    margin-bottom:8px;
+    border-radius:8px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.1);
+    cursor:pointer;
+  }
+  .btn {
+    background:#1a73e8;
+    color:white;
+    border:none;
+    padding:8px 12px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:14px;
+  }
+  .btn:active {
+    transform: scale(0.97);
+  }
+  .btn-secondary {
+    background:#6c757d;
+  }
+  .btn-danger {
+    background:#dc3545;
+  }
+  .btn-success {
+    background:#28a745;
+  }
+  #scannerSim {
+    margin-top:12px;
+    background:white;
+    padding:10px;
+    border-radius:8px;
+  }
+  .tag-seccion {
+    background:#e0e0e0;
+    padding:2px 6px;
+    border-radius:4px;
+    font-size:11px;
+    margin-right:4px;
+  }
+  .tag-prio {
+    padding:2px 6px;
+    border-radius:4px;
+    font-size:11px;
+  }
+  .tag-prio-alta {
+    background:#e53935;
+    color:white;
+  }
+  .tag-prio-media {
+    background:#fb8c00;
+    color:white;
+  }
+  .tag-prio-baja {
+    background:#43a047;
+    color:white;
+  }
+  .filters {
+    background:white;
+    padding:8px;
+    border-radius:8px;
+    margin-bottom:10px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.08);
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .filters select,
+  .filters input {
+    padding:6px;
+    border-radius:4px;
+    border:1px solid #ccc;
+    font-size:13px;
+    flex:1 1 45%;
+  }
+  .filters button {
+    flex:1 1 100%;
+  }
+  .section-title {
+    margin-top:10px;
+    margin-bottom:4px;
+    font-weight:bold;
+    font-size:14px;
+    color:#555;
+  }
+  .historial-list {
+    margin-top:6px;
+    font-size:11px;
+    color:#444;
+  }
+  .historial-list li {
+    margin-bottom:3px;
+  }
+  .due-badge {
+    padding:2px 6px;
+    border-radius:4px;
+    font-size:11px;
+    margin-left:6px;
+  }
+  .due-red {
+    background:#e53935;
+    color:white;
+  }
+  .due-orange {
+    background:#fb8c00;
+    color:white;
+  }
+  input, select {
+    box-sizing:border-box;
+  }
 </style>
 </head>
 
 <body>
-<header>Gestión Producción – Simulación</header>
+<header>Gestión OP producción</header>
 
 <div class="container">
 
@@ -156,43 +166,44 @@
       <option value="Baja">Baja</option>
     </select>
 
-    <input id="filtroBuscar" placeholder="Buscar por OP" oninput="renderOrdenes()" />
+    <input id="filtroOP" placeholder="Filtrar por OP" oninput="renderOrdenes()" />
     <input id="filtroCliente" placeholder="Filtrar por cliente" oninput="renderOrdenes()" />
 
     <button class="btn btn-secondary" onclick="limpiarFiltros()">Limpiar filtros</button>
   </div>
 
   <!-- Lista de órdenes -->
-  <h3>Órdenes de producción</h3>
+  <h3 style="margin:8px 0;">Órdenes de producción</h3>
   <div id="opList"></div>
 
-  <!-- Métodos de escaneo -->
-  <div style="margin-top:15px; margin-bottom:10px;">
-    <button class="btn" onclick="abrirScannerManual()">Introducir código manual</button>
-    <button class="btn btn-success" style="margin-left:8px;" onclick="abrirScannerCamara()">Escanear con cámara</button>
+  <!-- Escaneo / entrada código -->
+  <div style="margin-top:12px; margin-bottom:8px; display:flex; gap:6px;">
+    <button class="btn" style="flex:1;" onclick="abrirScannerManual()">Introducir código</button>
+    <button class="btn btn-success" style="flex:1;" onclick="abrirScannerCamara()">Cámara (simulada)</button>
   </div>
 
-  <!-- Simulador / Editor -->
+  <!-- Panel de escaneo / edición -->
   <div id="scannerSim" style="display:none;">
-    <h3>Escanear / abrir OP</h3>
-    <p>Introduce un código OP:</p>
+    <h3 style="margin-top:0;">Escanear / abrir OP</h3>
+    <p style="margin:4px 0;">Código de OP (manual o escaneado):</p>
 
-    <input id="codigoInput" placeholder="Ej: 2505823" style="padding:8px; width:100%;" />
-    <button class="btn" style="margin-top:10px;" onclick="simularEscaneo()">Cargar OP</button>
+    <input id="codigoInput" placeholder="Ej: 2505823"
+           style="padding:8px; width:100%; margin-bottom:6px;" />
+    <button class="btn" style="margin-bottom:8px;" onclick="simularEscaneo()">Cargar OP</button>
 
-    <p id="resultado" style="margin-top:15px; font-weight:bold;"></p>
+    <p id="resultado" style="margin-top:4px; font-weight:bold;"></p>
 
     <!-- Editor -->
     <div id="editorOP"
-         style="margin-top:15px; display:none; background:#fafafa; padding:10px; border-radius:8px; border:1px solid #ddd;">
+         style="margin-top:10px; display:none; background:#fafafa; padding:8px; border-radius:8px; border:1px solid #ddd;">
 
-      <p><strong>OP actual:</strong> <span id="opCodigo"></span></p>
+      <p style="margin:4px 0;"><strong>OP actual:</strong> <span id="opCodigo"></span></p>
 
-      <label>Cliente (opcional):</label>
-      <input id="clienteInput" style="padding:8px; width:100%; margin-bottom:8px;" />
+      <label style="font-size:13px;">Cliente (opcional):</label>
+      <input id="clienteInput" style="padding:8px; width:100%; margin-bottom:6px;" />
 
-      <label>Sección:</label>
-      <select id="seccionSelect" style="padding:8px; width:100%; margin-bottom:8px;">
+      <label style="font-size:13px;">Sección:</label>
+      <select id="seccionSelect" style="padding:8px; width:100%; margin-bottom:6px;">
         <option value="Corte">Corte</option>
         <option value="Pantógrafos">Pantógrafos</option>
         <option value="Bancos">Bancos</option>
@@ -201,32 +212,33 @@
         <option value="Archivo">Archivo</option>
       </select>
 
-      <label>Fecha de entrega:</label>
-      <input type="date" id="fechaEntrega" style="padding:8px; width:100%; margin-bottom:8px;" />
+      <label style="font-size:13px;">Fecha de entrega (obligatoria):</label>
+      <input type="date" id="fechaEntrega" style="padding:8px; width:100%; margin-bottom:6px;" />
 
-      <label>Prioridad:</label>
-      <select id="prioridadSelect" style="padding:8px; width:100%; margin-bottom:8px;">
+      <label style="font-size:13px;">Prioridad:</label>
+      <select id="prioridadSelect" style="padding:8px; width:100%; margin-bottom:6px;">
         <option value="Alta">Alta</option>
         <option value="Media" selected>Media</option>
         <option value="Baja">Baja</option>
       </select>
 
-      <div style="display:flex; gap:8px; margin-top:5px;">
-        <button class="btn" onclick="guardarOP()">Guardar / Actualizar</button>
-        <button class="btn btn-secondary" type="button" onclick="toggleHistorial()">Historial</button>
-        <button class="btn" style="background:#dc3545" type="button" onclick="eliminarOP()">Eliminar</button>
+      <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:4px;">
+        <button class="btn" style="flex:1;" onclick="guardarOP()">Guardar</button>
+        <button class="btn btn-secondary" style="flex:1;" type="button" onclick="toggleHistorial()">Historial</button>
+        <button class="btn btn-danger" style="flex:1;" type="button" onclick="eliminarOP()">Eliminar</button>
       </div>
 
       <ul id="historialOP" class="historial-list" style="display:none;"></ul>
-      <p id="movimientoResultado" style="margin-top:10px; font-weight:bold;"></p>
+      <p id="movimientoResultado" style="margin-top:6px; font-weight:bold;"></p>
     </div>
   </div>
 </div>
 
 <script>
-/* ------- PERSISTENCIA LOCAL -------- */
+/* ===== PERSISTENCIA LOCAL (OFFLINE) ===== */
 const STORAGE_KEY = 'op_app_ordenes_v1';
 let ordenes = [];
+let opActual = null;
 
 function loadOrdenes() {
   try {
@@ -247,22 +259,19 @@ function saveOrdenes() {
   }
 }
 
-let opActual = null;
-
-/* --------- FILTROS --------- */
+/* ===== FILTROS ===== */
 function limpiarFiltros() {
   document.getElementById('filtroSeccion').value  = 'Todas';
   document.getElementById('filtroPrioridad').value = 'Todas';
-  document.getElementById('filtroBuscar').value   = '';
+  document.getElementById('filtroOP').value       = '';
   document.getElementById('filtroCliente').value  = '';
   renderOrdenes();
 }
 
-/* Limpieza automática de Archivo (más de 15 días) */
+/* Limpieza automática de OP en Archivo con más de 15 días desde fecha entrega */
 function limpiarAntiguas() {
   const ahora = new Date();
   const DIA   = 24 * 60 * 60 * 1000;
-
   const paraBorrar = [];
 
   ordenes.forEach(op => {
@@ -285,8 +294,7 @@ function limpiarAntiguas() {
   }
 }
 
-/* ---------- RENDER DEL TABLERO ---------- */
-
+/* ===== RENDER TABLERO ===== */
 function renderOrdenes() {
   limpiarAntiguas();
 
@@ -296,7 +304,7 @@ function renderOrdenes() {
 
   const filtroSec     = document.getElementById('filtroSeccion').value;
   const filtroPri     = document.getElementById('filtroPrioridad').value;
-  const filtroTxt     = document.getElementById('filtroBuscar').value.trim().toLowerCase();
+  const filtroOP      = document.getElementById('filtroOP').value.trim().toLowerCase();
   const filtroCliente = document.getElementById('filtroCliente').value.trim().toLowerCase();
 
   const prioridadValor = { Alta:1, Media:2, Baja:3 };
@@ -305,9 +313,9 @@ function renderOrdenes() {
     if (filtroSec !== 'Todas' && op.seccion !== filtroSec) return false;
     if (filtroPri !== 'Todas' && op.prioridad !== filtroPri) return false;
 
-    if (filtroTxt) {
-      const txt = (op.codigo || '').toLowerCase();
-      if (!txt.includes(filtroTxt)) return false;
+    if (filtroOP) {
+      const txtOp = (op.codigo || '').toLowerCase();
+      if (!txtOp.includes(filtroOP)) return false;
     }
 
     if (filtroCliente) {
@@ -318,21 +326,18 @@ function renderOrdenes() {
     return true;
   });
 
-  // Orden: fecha más cercana primero, luego prioridad (Alta, Media, Baja)
+  // Ordenar: fecha más cercana primero, sin fecha al final; luego prioridad
   lista.sort((a, b) => {
     const fa = a.fechaEntrega || '';
     const fb = b.fechaEntrega || '';
 
-    // Sin fecha vs con fecha
     if (!fa && fb) return 1;
     if (fa && !fb) return -1;
 
-    // Ambas con fecha y distintas
     if (fa && fb && fa !== fb) {
-      return fa.localeCompare(fb);
+      return fa.localeCompare(fb); // YYYY-MM-DD → orden correcto
     }
 
-    // Misma fecha o ambas vacías: se ordena por prioridad
     const pa = prioridadValor[a.prioridad] || 99;
     const pb = prioridadValor[b.prioridad] || 99;
     return pa - pb;
@@ -351,15 +356,16 @@ function renderOrdenes() {
 
     const card = document.createElement('div');
     card.className = 'op-card';
+
     const prioridad = op.prioridad || 'Media';
     const prioClass = 'tag-prio-' + prioridad.toLowerCase();
 
-    // Cálculo de días restantes para colorear por proximidad
+    // Cálculo de días restantes
     const MS_DAY = 24 * 60 * 60 * 1000;
     let badgeHtml = '';
     if (op.fechaEntrega) {
       const hoy = new Date();
-      const f   = new Date(op.fechaEntrega);
+      const f   = new Date(op.fechaEntrega + 'T00:00:00');
       if (!isNaN(f)) {
         const diff = Math.floor((f - hoy) / MS_DAY); // días hasta la entrega
         if (diff <= 3) {
@@ -387,14 +393,14 @@ function renderOrdenes() {
   }
 }
 
-/* --------- SCAN/EDICIÓN --------- */
-
+/* ===== ESCANEO / EDICIÓN ===== */
 function abrirScannerManual() {
   document.getElementById('scannerSim').style.display = 'block';
 }
 
 function abrirScannerCamara() {
-  alert('Aquí activaremos la cámara cuando la app esté servida por HTTPS con permisos de cámara.');
+  // Cuando trabajemos con lector real de códigos, aquí activaremos la cámara.
+  alert('Modo cámara simulado. Más adelante conectaremos con la cámara real.');
   document.getElementById('scannerSim').style.display = 'block';
 }
 
@@ -444,12 +450,13 @@ function simularEscaneo() {
   pintarHistorial();
 }
 
+/* ===== GUARDAR / ELIMINAR ===== */
 function guardarOP() {
   if (!opActual) return;
 
   const fecha = document.getElementById('fechaEntrega').value;
   if (!fecha) {
-    alert('La fecha de entrega es obligatoria para crear/actualizar la OP.');
+    alert('La fecha de entrega es obligatoria.');
     return;
   }
 
@@ -462,8 +469,8 @@ function guardarOP() {
   opActual.prioridad    = document.getElementById('prioridadSelect').value;
 
   const marcaTiempo = new Date().toLocaleString();
+  const cambios = [];
 
-  let cambios = [];
   if (seccionAnterior !== opActual.seccion) {
     cambios.push(`Sección: ${seccionAnterior || 'Sin'} → ${opActual.seccion}`);
   }
@@ -500,8 +507,7 @@ function eliminarOP() {
   renderOrdenes();
 }
 
-/* --------- HISTORIAL --------- */
-
+/* ===== HISTORIAL ===== */
 function pintarHistorial() {
   const ul = document.getElementById('historialOP');
   ul.innerHTML = '';
@@ -527,7 +533,7 @@ function toggleHistorial() {
   }
 }
 
-/* ---- REGISTRO DEL SERVICE WORKER ---- */
+/* ===== SERVICE WORKER (PWA OFFLINE) ===== */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('service-worker.js')
@@ -535,7 +541,7 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-/* ---- INICIO ---- */
+/* ===== INICIO ===== */
 window.addEventListener('DOMContentLoaded', () => {
   loadOrdenes();
   renderOrdenes();
