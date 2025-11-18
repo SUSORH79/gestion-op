@@ -33,7 +33,6 @@
     margin-bottom:8px;
     border-radius:8px;
     box-shadow:0 1px 3px rgba(0,0,0,0.1);
-    cursor:pointer;
   }
   .btn {
     background:#1a73e8;
@@ -55,6 +54,10 @@
   }
   .btn-success {
     background:#28a745;
+  }
+  .btn-small {
+    padding:4px 8px;
+    font-size:12px;
   }
   #scannerSim {
     margin-top:12px;
@@ -157,7 +160,7 @@
   <!-- Escaneo / entrada código -->
   <div style="margin-top:12px; margin-bottom:8px; display:flex; gap:6px;">
     <button class="btn" style="flex:1;" onclick="abrirScannerManual()">Introducir código</button>
-    <button class="btn btn-success" style="flex:1;" onclick="abrirScannerCamara()">Cámara (simulada)</button>
+    <button class="btn btn-success" style="flex:1;" onclick="abrirScannerCamara()">Cámara</button>
   </div>
 
   <!-- Panel de escaneo / edición -->
@@ -344,13 +347,16 @@ function renderOrdenes() {
     }
 
     card.innerHTML = `
-      <strong>OP:</strong> ${op.codigo}<br>
-      ${op.cliente ? `<strong>Cliente:</strong> ${op.cliente}<br>` : ""}
-      ${op.mueble ? `<strong>Mueble:</strong> ${op.mueble}<br>` : ""}
-      <strong>Fecha entrega:</strong> ${op.fechaEntrega || '-'}${badgeHtml ? ' ' + badgeHtml : ''}<br>
-      <span class="tag-seccion">${op.seccion}</span>
+      <div><strong>OP:</strong> ${op.codigo}</div>
+      ${op.cliente ? `<div><strong>Cliente:</strong> ${op.cliente}</div>` : ""}
+      ${op.mueble ? `<div><strong>Mueble:</strong> ${op.mueble}</div>` : ""}
+      <div><strong>Fecha entrega:</strong> ${op.fechaEntrega || '-'}${badgeHtml ? ' ' + badgeHtml : ''}</div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+        <span class="tag-seccion">${op.seccion}</span>
+        <button class="btn btn-secondary btn-small"
+          onclick="event.stopPropagation(); abrirDesdeLista('${op.codigo}')">Editar</button>
+      </div>
     `;
-    card.onclick = () => abrirDesdeLista(op.codigo);
     cont.appendChild(card);
   });
 
@@ -362,11 +368,15 @@ function renderOrdenes() {
 /* ===== ESCANEO / EDICIÓN ===== */
 function abrirScannerManual() {
   document.getElementById('scannerSim').style.display = 'block';
+  const input = document.getElementById('codigoInput');
+  input.focus();
 }
 
 function abrirScannerCamara() {
-  alert('Modo cámara simulado. Más adelante conectaremos con la cámara real.');
+  // De momento abre el panel de escaneo; más adelante se puede integrar lector real
   document.getElementById('scannerSim').style.display = 'block';
+  const input = document.getElementById('codigoInput');
+  input.focus();
 }
 
 function abrirDesdeLista(codigo) {
