@@ -1,588 +1,543 @@
-
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Gestión OP - Oficina / Seccionadora / Pantógrafos / Bancos</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gestión Producción – OP</title>
 
-  <!-- Evitar cache en móviles -->
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
+<meta name="theme-color" content="#1a73e8" />
+<link rel="manifest" href="manifest.webmanifest" />
 
-  <!-- PWA -->
-  <meta name="theme-color" content="#004b7c">
-  <link rel="manifest" href="manifest.webmanifest">
-  <!-- Iconos: cuando subas icon-192.png y icon-512.png se usarán aquí -->
-  <link rel="icon" href="icon-192.png">
-
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0; padding: 0;
-      font-family: system-ui, sans-serif;
-      background: #f2f2f2;
-      color: #333;
-    }
-
-    header {
-      background: #004b7c;
-      color: white;
-      padding: 10px 16px;
-    }
-
-    main {
-      padding: 10px 16px 40px;
-      max-width: 1300px;
-      margin: auto;
-    }
-
-    .panel {
-      padding: 12px;
-      background: white;
-      border-radius: 6px;
-      margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-
-    h2,h4 { margin: 6px 0; }
-
-    /* Formulario */
-    form#form-op {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 10px;
-    }
-
-    label { font-size: .8rem; font-weight: 600; }
-    input[type=text], input[type=date] {
-      padding: 6px; border-radius: 4px;
-      border: 1px solid #ccc; font-size: .9rem;
-    }
-
-    button {
-      border: none; border-radius: 4px;
-      padding: 7px 10px; cursor: pointer;
-      font-size: .85rem;
-    }
-    .btn-principal { background: #0069d9; color: white; }
-    .btn-secundario { background: #ddd; }
-    .btn-peligro { background: #dc3545; color: white; }
-
-    /* Tablero */
-    .board-op {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 14px;
-    }
-
-    .columna-op {
-      background: #fafafa;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      padding: 6px;
-      min-height: 120px;
-    }
-
-    .lista-op { display: flex; flex-direction: column; gap: 6px; }
-
-    .op-card {
-      background: white;
-      border: 1px solid #bbb;
-      border-radius: 5px;
-      padding: 8px;
-      font-size: .85rem;
-    }
-
-    .op-card-header {
-      display: flex; justify-content: space-between;
-      font-weight: bold; margin-bottom: 4px;
-    }
-
-    .tag-urgencia {
-      background: rgba(255,255,255,0.7);
-      border: 1px solid #999;
-      padding: 2px 6px;
-      font-size: .7rem;
-      border-radius: 999px;
-    }
-
-    .op-card-buttons {
-      display: flex; flex-wrap: wrap; gap: 4px;
-      margin-top: 6px;
-    }
-
-    .contador {
-      text-align: right;
-      margin-top: 6px;
-      font-size: .8rem;
-    }
-
-    /* QR */
-    #qr-reader {
-      width: 100%;
-      max-width: 380px;
-      margin-top: 8px;
-    }
-    #qr-estado {
-      font-size: .8rem;
-      margin-top: 4px;
-      color: #555;
-    }
-  </style>
+<style>
+ body {
+   font-family: Arial, sans-serif;
+   margin: 0;
+   padding: 0;
+   background:#f2f2f2;
+ }
+ header {
+   background:#1a73e8;
+   color:white;
+   padding:15px;
+   font-size:20px;
+   text-align:center;
+ }
+ .container {
+   padding:15px;
+ }
+ .op-card {
+   background:white;
+   padding:12px 15px;
+   margin-bottom:10px;
+   border-radius:8px;
+   box-shadow:0 1px 3px rgba(0,0,0,0.1);
+   cursor:pointer;
+ }
+ .op-card:hover {
+   box-shadow:0 2px 6px rgba(0,0,0,0.16);
+ }
+ .btn {
+   background:#1a73e8;
+   color:white;
+   border:none;
+   padding:8px 12px;
+   border-radius:6px;
+   cursor:pointer;
+   font-size:14px;
+ }
+ .btn:active {
+   transform: scale(0.97);
+ }
+ .btn-secondary {
+   background:#6c757d;
+ }
+ .btn-success {
+   background:#28a745;
+ }
+ #scannerSim {
+   margin-top:20px;
+   background:white;
+   padding:15px;
+   border-radius:8px;
+ }
+ .tag-seccion {
+   background:#e0e0e0;
+   padding:2px 6px;
+   border-radius:4px;
+   font-size:12px;
+ }
+ .tag-prio {
+   padding:2px 6px;
+   border-radius:4px;
+   font-size:12px;
+ }
+ .tag-prio-alta {
+   background:#e53935;
+   color:white;
+ }
+ .tag-prio-media {
+   background:#fb8c00;
+   color:white;
+ }
+ .tag-prio-baja {
+   background:#43a047;
+   color:white;
+ }
+ .filters {
+   background:white;
+   padding:10px;
+   border-radius:8px;
+   margin-bottom:15px;
+   box-shadow:0 1px 3px rgba(0,0,0,0.08);
+   display:flex;
+   flex-wrap:wrap;
+   gap:8px;
+ }
+ .filters select,
+ .filters input {
+   padding:6px;
+   border-radius:4px;
+   border:1px solid #ccc;
+   font-size:14px;
+ }
+ .section-title {
+   margin-top:15px;
+   margin-bottom:5px;
+   font-weight:bold;
+   font-size:15px;
+   color:#555;
+ }
+ .historial-list {
+   margin-top:8px;
+   font-size:12px;
+   color:#444;
+ }
+ .historial-list li {
+   margin-bottom:4px;
+ }
+ .due-badge {
+   padding:2px 6px;
+   border-radius:4px;
+   font-size:12px;
+   margin-left:6px;
+ }
+ .due-red {
+   background:#e53935;
+   color:white;
+ }
+ .due-orange {
+   background:#fb8c00;
+   color:white;
+ }
+</style>
 </head>
+
 <body>
+<header>Gestión Producción – Simulación</header>
 
-<header><h1>Gestión OP · Oficina / Seccionadora / Pantógrafos / Bancos</h1></header>
+<div class="container">
 
-<main>
+  <!-- Filtros -->
+  <div class="filters">
+    <select id="filtroSeccion" onchange="renderOrdenes()">
+      <option value="Todas">Todas las secciones</option>
+      <option value="Corte">Corte</option>
+      <option value="Pantógrafos">Pantógrafos</option>
+      <option value="Bancos">Bancos</option>
+      <option value="Barnizado">Barnizado</option>
+      <option value="Montaje">Montaje</option>
+      <option value="Archivo">Archivo</option>
+    </select>
 
-  <!-- FORMULARIO -->
-  <section class="panel">
-    <h2>Crear o Actualizar OP</h2>
-    <form id="form-op">
-      <div>
-        <label>OP *</label>
-        <input type="text" id="op" required>
+    <select id="filtroPrioridad" onchange="renderOrdenes()">
+      <option value="Todas">Todas las prioridades</option>
+      <option value="Alta">Alta</option>
+      <option value="Media">Media</option>
+      <option value="Baja">Baja</option>
+    </select>
+
+    <input id="filtroBuscar" placeholder="Buscar por OP" oninput="renderOrdenes()" />
+    <input id="filtroCliente" placeholder="Filtrar por cliente" oninput="renderOrdenes()" />
+
+    <button class="btn btn-secondary" onclick="limpiarFiltros()">Limpiar filtros</button>
+  </div>
+
+  <!-- Lista de órdenes -->
+  <h3>Órdenes de producción</h3>
+  <div id="opList"></div>
+
+  <!-- Métodos de escaneo -->
+  <div style="margin-top:15px; margin-bottom:10px;">
+    <button class="btn" onclick="abrirScannerManual()">Introducir código manual</button>
+    <button class="btn btn-success" style="margin-left:8px;" onclick="abrirScannerCamara()">Escanear con cámara</button>
+  </div>
+
+  <!-- Simulador / Editor -->
+  <div id="scannerSim" style="display:none;">
+    <h3>Escanear / abrir OP</h3>
+    <p>Introduce un código OP:</p>
+
+    <input id="codigoInput" placeholder="Ej: 2505823" style="padding:8px; width:100%;" />
+    <button class="btn" style="margin-top:10px;" onclick="simularEscaneo()">Cargar OP</button>
+
+    <p id="resultado" style="margin-top:15px; font-weight:bold;"></p>
+
+    <!-- Editor -->
+    <div id="editorOP"
+         style="margin-top:15px; display:none; background:#fafafa; padding:10px; border-radius:8px; border:1px solid #ddd;">
+
+      <p><strong>OP actual:</strong> <span id="opCodigo"></span></p>
+
+      <label>Cliente (opcional):</label>
+      <input id="clienteInput" style="padding:8px; width:100%; margin-bottom:8px;" />
+
+      <label>Sección:</label>
+      <select id="seccionSelect" style="padding:8px; width:100%; margin-bottom:8px;">
+        <option value="Corte">Corte</option>
+        <option value="Pantógrafos">Pantógrafos</option>
+        <option value="Bancos">Bancos</option>
+        <option value="Barnizado">Barnizado</option>
+        <option value="Montaje">Montaje</option>
+        <option value="Archivo">Archivo</option>
+      </select>
+
+      <label>Fecha de entrega:</label>
+      <input type="date" id="fechaEntrega" style="padding:8px; width:100%; margin-bottom:8px;" />
+
+      <label>Prioridad:</label>
+      <select id="prioridadSelect" style="padding:8px; width:100%; margin-bottom:8px;">
+        <option value="Alta">Alta</option>
+        <option value="Media" selected>Media</option>
+        <option value="Baja">Baja</option>
+      </select>
+
+      <div style="display:flex; gap:8px; margin-top:5px;">
+        <button class="btn" onclick="guardarOP()">Guardar / Actualizar</button>
+        <button class="btn btn-secondary" type="button" onclick="toggleHistorial()">Historial</button>
+        <button class="btn" style="background:#dc3545" type="button" onclick="eliminarOP()">Eliminar</button>
       </div>
-      <div>
-        <label>Mueble</label>
-        <input type="text" id="descripcion">
-      </div>
-      <div>
-        <label>Cliente</label>
-        <input type="text" id="cliente">
-      </div>
-      <div>
-        <label>Fecha Entrega *</label>
-        <input type="date" id="fechaEntrega" required>
-      </div>
-      <div>
-        <button class="btn-principal" type="submit">Guardar / Actualizar</button>
-        <button type="button" class="btn-secundario" id="btn-limpiar-form">Limpiar</button>
-      </div>
-    </form>
-  </section>
 
-  <!-- ESCÁNER QR / CÓDIGO -->
-  <section class="panel">
-    <h2>Escanear OP con la cámara</h2>
-    <p style="font-size:.85rem;">
-      Pulsa <strong>Iniciar cámara</strong>, apunta al código (QR o código legible) de la OP
-      y cuando lo lea, rellenará el campo <strong>OP</strong> automáticamente.
-    </p>
-    <button id="btn-toggle-qr" class="btn-secundario">Iniciar cámara</button>
-    <div id="qr-estado"></div>
-    <div id="qr-reader" style="display:none;"></div>
-  </section>
-
-  <!-- TABLERO -->
-  <section class="panel">
-    <h2>Estado de las OP</h2>
-
-    <div class="board-op">
-
-      <!-- OFICINA -->
-      <div class="columna-op" data-seccion="Oficina">
-        <h4>Oficina</h4>
-        <div id="col-oficina" class="lista-op"></div>
-        <div id="count-oficina" class="contador"></div>
-      </div>
-
-      <!-- SECCIONADORA -->
-      <div class="columna-op" data-seccion="Seccionadora">
-        <h4>Seccionadora</h4>
-        <div id="col-seccionadora" class="lista-op"></div>
-        <div id="count-seccionadora" class="contador"></div>
-      </div>
-
-      <!-- PANTÓGRAFOS -->
-      <div class="columna-op" data-seccion="Pantografos">
-        <h4>Pantógrafos</h4>
-        <div id="col-pantografos" class="lista-op"></div>
-        <div id="count-pantografos" class="contador"></div>
-      </div>
-
-      <!-- BANCOS -->
-      <div class="columna-op" data-seccion="Bancos">
-        <h4>Bancos</h4>
-        <div id="col-bancos" class="lista-op"></div>
-        <div id="count-bancos" class="contador"></div>
-      </div>
-
+      <ul id="historialOP" class="historial-list" style="display:none;"></ul>
+      <p id="movimientoResultado" style="margin-top:10px; font-weight:bold;"></p>
     </div>
-  </section>
-
-</main>
-
-<!-- Librería de escaneo QR -->
-<script src="https://unpkg.com/html5-qrcode" defer></script>
+  </div>
+</div>
 
 <script>
-/* ================================
-   LOCAL STORAGE
-================================ */
-const STORAGE_KEY = "ops_produccion_v5";
-let ops = [];
+/* ------- PERSISTENCIA LOCAL -------- */
+const STORAGE_KEY = 'op_app_ordenes_v1';
+let ordenes = [];
 
-function cargarOps() {
-  ops = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-}
-
-function guardarOps() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(ops));
-}
-
-/* ================================
-   UTILIDADES
-================================ */
-function diasHasta(fecha) {
-  const hoy = new Date();
-  const f = new Date(fecha + "T00:00:00");
-  return Math.round((f - hoy) / 86400000);
-}
-
-function colorPorUrgencia(fecha) {
-  const d = diasHasta(fecha);
-  if (isNaN(d)) return "#ffffff";
-  if (d < 0) return "#ffcccc";
-  if (d <= 2) return "#ffe0cc";
-  if (d <= 7) return "#fff3cd";
-  return "#d4edda";
-}
-
-function textoUrgencia(fecha) {
-  const d = diasHasta(fecha);
-  if (isNaN(d)) return "-";
-  if (d < 0) return `Vencida ${Math.abs(d)}d`;
-  if (d === 0) return "Hoy";
-  if (d === 1) return "Mañana";
-  return `En ${d}d`;
-}
-
-function siguienteOrden(seccion) {
-  const lista = ops.filter(o => o.seccion === seccion);
-  if (!lista.length) return 1;
-  return Math.max(...lista.map(o => o.orden || 0)) + 1;
-}
-
-/* ================================
-   CRUD
-================================ */
-function upsertOP(data) {
-  let item = ops.find(o => o.op === data.op);
-
-  if (!item) {
-    ops.push({
-      op: data.op,
-      descripcion: data.descripcion || "",
-      cliente: data.cliente || "",
-      fechaEntrega: data.fechaEntrega,
-      seccion: "Oficina",
-      orden: siguienteOrden("Oficina")
-    });
-  } else {
-    item.descripcion = data.descripcion;
-    item.cliente = data.cliente;
-    item.fechaEntrega = data.fechaEntrega;
+function loadOrdenes() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (Array.isArray(data)) ordenes = data;
+  } catch(e) {
+    console.error('Error cargando ordenes', e);
   }
-
-  guardarOps();
-  render();
 }
 
-function borrarOP(cod) {
-  if (!confirm("¿Borrar OP " + cod + "?")) return;
-  ops = ops.filter(o => o.op !== cod);
-  guardarOps();
-  render();
+function saveOrdenes() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(ordenes));
+  } catch(e) {
+    console.error('Error guardando ordenes', e);
+  }
 }
 
-function moverOP(cod, destino) {
-  let item = ops.find(o => o.op === cod);
-  if (!item) return;
-  item.seccion = destino;
-  item.orden = siguienteOrden(destino);
-  guardarOps();
-  render();
+/* --------- GLOBAL --------- */
+let opActual = null;
+
+/* --------- FILTROS --------- */
+function limpiarFiltros() {
+  document.getElementById('filtroSeccion').value = 'Todas';
+  document.getElementById('filtroPrioridad').value = 'Todas';
+  document.getElementById('filtroBuscar').value = '';
+  document.getElementById('filtroCliente').value = '';
+  renderOrdenes();
 }
 
-function subirOP(cod) {
-  let op = ops.find(o => o.op === cod);
-  if (!op) return;
-  let lista = ops.filter(o => o.seccion === op.seccion).sort((a,b)=>a.orden-b.orden);
-  let idx = lista.indexOf(op);
-  if (idx <= 0) return;
-
-  let arriba = lista[idx - 1];
-  [op.orden, arriba.orden] = [arriba.orden, op.orden];
-  guardarOps();
-  render();
-}
-
-function bajarOP(cod) {
-  let op = ops.find(o => o.op === cod);
-  if (!op) return;
-  let lista = ops.filter(o => o.seccion === op.seccion).sort((a,b)=>a.orden-b.orden);
-  let idx = lista.indexOf(op);
-  if (idx === lista.length - 1) return;
-
-  let abajo = lista[idx + 1];
-  [op.orden, abajo.orden] = [abajo.orden, op.orden];
-  guardarOps();
-  render();
-}
-
-function editarOP(cod) {
-  let item = ops.find(o => o.op === cod);
-  if (!item) return;
-
-  let d = prompt("Descripción:", item.descripcion);
-  if (d === null) return;
-
-  let c = prompt("Cliente:", item.cliente);
-  if (c === null) return;
-
-  let f = prompt("Fecha entrega (YYYY-MM-DD):", item.fechaEntrega);
-  if (!f) return alert("Fecha obligatoria");
-
-  item.descripcion = d;
-  item.cliente = c;
-  item.fechaEntrega = f;
-
-  guardarOps();
-  render();
-}
-
-/* ================================
-   BORRADO AUTOMÁTICO 15 DÍAS
-================================ */
+/* Limpieza automática de Archivo (más de 15 días) */
 function limpiarAntiguas() {
-  let hoy = new Date();
-  let eliminar = ops.filter(o => {
-    let f = new Date(o.fechaEntrega + "T00:00:00");
-    return (hoy - f) / 86400000 > 15;
+  const ahora = new Date();
+  const DIA = 24 * 60 * 60 * 1000;
+
+  const paraBorrar = [];
+
+  ordenes.forEach(op => {
+    if (op.seccion !== 'Archivo') return;
+    if (!op.fechaEntrega) return;
+    const f = new Date(op.fechaEntrega);
+    if (isNaN(f)) return;
+    const diffDias = (ahora - f) / DIA;
+    if (diffDias >= 15) {
+      paraBorrar.push(op.codigo);
+    }
   });
 
-  if (eliminar.length > 0) {
-    if (confirm("Hay " + eliminar.length + " OP antiguas (+15 días). ¿Borrar?")) {
-      let ids = new Set(eliminar.map(x => x.op));
-      ops = ops.filter(o => !ids.has(o.op));
-      guardarOps();
+  if (paraBorrar.length > 0) {
+    const msg = `Hay ${paraBorrar.length} OP en ARCHIVO con fecha de entrega de hace más de 15 días.\n\n¿Quieres borrarlas definitivamente?`;
+    if (confirm(msg)) {
+      ordenes = ordenes.filter(o => !paraBorrar.includes(o.codigo));
+      saveOrdenes();
     }
   }
 }
 
-/* ================================
-   RENDER TABLERO
-================================ */
-function botonesMovimientoHTML(op) {
-  if (op.seccion === "Oficina")
-    return `<button onclick="moverOP('${op.op}','Seccionadora')">▶ Seccionadora</button>`;
+/* ---------- RENDER DEL TABLERO ---------- */
 
-  if (op.seccion === "Seccionadora")
-    return `
-      <button onclick="moverOP('${op.op}','Oficina')">◀ Oficina</button>
-      <button onclick="moverOP('${op.op}','Pantografos')">▶ Pantógrafos</button>
-    `;
-
-  if (op.seccion === "Pantografos")
-    return `
-      <button onclick="moverOP('${op.op}','Seccionadora')">◀ Seccionadora</button>
-      <button onclick="moverOP('${op.op}','Bancos')">▶ Bancos</button>
-    `;
-
-  if (op.seccion === "Bancos")
-    return `<button onclick="moverOP('${op.op}','Pantografos')">◀ Pantógrafos</button>`;
-
-  return "";
-}
-
-function render() {
-  const col = {
-    Oficina: document.getElementById("col-oficina"),
-    Seccionadora: document.getElementById("col-seccionadora"),
-    Pantografos: document.getElementById("col-pantografos"),
-    Bancos: document.getElementById("col-bancos")
-  };
-
-  const cnt = {
-    Oficina: document.getElementById("count-oficina"),
-    Seccionadora: document.getElementById("count-seccionadora"),
-    Pantografos: document.getElementById("count-pantografos"),
-    Bancos: document.getElementById("count-bancos")
-  };
-
-  Object.values(col).forEach(c => c.innerHTML = "");
-  Object.values(cnt).forEach(c => c.innerHTML = "");
-
-  const secciones = ["Oficina", "Seccionadora", "Pantografos", "Bancos"];
-
-  secciones.forEach(sec => {
-    let lista = ops
-      .filter(o => o.seccion === sec)
-      .sort((a,b)=> (a.orden || 0) - (b.orden || 0));
-
-    cnt[sec].innerText = "Total: " + lista.length;
-
-    lista.forEach(op => {
-      let card = document.createElement("div");
-      card.className = "op-card";
-      card.style.background = colorPorUrgencia(op.fechaEntrega);
-
-      card.innerHTML = `
-        <div class="op-card-header">
-          OP ${op.op}
-          <span class="tag-urgencia">${textoUrgencia(op.fechaEntrega)}</span>
-        </div>
-
-        <div><strong>Mueble:</strong> ${op.descripcion || "-"}</div>
-        <div><strong>Cliente:</strong> ${op.cliente || "-"}</div>
-        <div><strong>Entrega:</strong> ${op.fechaEntrega || "-"}</div>
-
-        <div class="op-card-buttons">
-          <button onclick="subirOP('${op.op}')">▲</button>
-          <button onclick="bajarOP('${op.op}')">▼</button>
-          ${botonesMovimientoHTML(op)}
-          <button onclick="editarOP('${op.op}')">Editar</button>
-          <button class="btn-peligro" onclick="borrarOP('${op.op}')">Borrar</button>
-        </div>
-      `;
-
-      col[sec].appendChild(card);
-    });
-  });
-}
-
-/* ================================
-   FORMULARIO
-================================ */
-function initForm() {
-  const f = document.getElementById("form-op");
-  const inputOP = document.getElementById("op");
-
-  f.addEventListener("submit", e => {
-    e.preventDefault();
-
-    let op = inputOP.value.trim();
-    let descripcion = document.getElementById("descripcion").value.trim();
-    let cliente = document.getElementById("cliente").value.trim();
-    let fecha = document.getElementById("fechaEntrega").value;
-
-    if (!op) return alert("OP requerida");
-    if (!fecha) return alert("Fecha obligatoria");
-
-    upsertOP({ op, descripcion, cliente, fechaEntrega: fecha });
-    f.reset();
-    inputOP.focus();
-  });
-
-  document
-    .getElementById("btn-limpiar-form")
-    .addEventListener("click", () => f.reset());
-}
-
-/* ================================
-   ESCÁNER QR / CÁMARA
-================================ */
-let qrScanner = null;
-let qrRunning = false;
-
-function initQR() {
-  const btn = document.getElementById("btn-toggle-qr");
-  const estado = document.getElementById("qr-estado");
-  const divReader = document.getElementById("qr-reader");
-  const inputOP = document.getElementById("op");
-
-  if (!btn || !divReader) return;
-
-  btn.addEventListener("click", async () => {
-    if (qrRunning) {
-      // Parar
-      if (qrScanner) {
-        await qrScanner.stop().catch(()=>{});
-        await qrScanner.clear().catch(()=>{});
-      }
-      qrRunning = false;
-      divReader.style.display = "none";
-      btn.textContent = "Iniciar cámara";
-      estado.textContent = "";
-      return;
-    }
-
-    // Iniciar
-    try {
-      if (!window.Html5Qrcode) {
-        estado.textContent = "Cargando librería de cámara...";
-        return;
-      }
-
-      divReader.style.display = "block";
-      estado.textContent = "Abriendo cámara...";
-
-      qrScanner = new Html5Qrcode("qr-reader");
-
-      await qrScanner.start(
-        { facingMode: "environment" },
-        {
-          fps: 10,
-          qrbox: { width: 250, height: 250 }
-        },
-        (decodedText) => {
-          // Cuando lee algo
-          inputOP.value = decodedText.trim();
-          estado.textContent = "Leído: " + decodedText;
-        },
-        (error) => {
-          // errores de lectura continuos: no hacemos nada
-        }
-      );
-
-      qrRunning = true;
-      btn.textContent = "Parar cámara";
-      estado.textContent = "Apunta al código de la OP.";
-    } catch (err) {
-      console.error(err);
-      estado.textContent = "No se pudo acceder a la cámara.";
-      divReader.style.display = "none";
-      qrRunning = false;
-    }
-  });
-}
-
-/* ================================
-   SERVICE WORKER (PWA)
-================================ */
-function initServiceWorker() {
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js").catch(err => {
-      console.log("SW error:", err);
-    });
-  }
-}
-
-/* ================================
-   INICIO
-================================ */
-window.onload = () => {
-  cargarOps();
+function renderOrdenes() {
   limpiarAntiguas();
-  initForm();
-  render();
-  initQR();
-  initServiceWorker();
-};
 
-// Global para onclick
-window.moverOP = moverOP;
-window.subirOP = subirOP;
-window.bajarOP = bajarOP;
-window.editarOP = editarOP;
-window.borrarOP = borrarOP;
+  const cont = document.getElementById('opList');
+  cont.innerHTML = '';
+
+  const filtroSec      = document.getElementById('filtroSeccion').value;
+  const filtroPri      = document.getElementById('filtroPrioridad').value;
+  const filtroTxt      = document.getElementById('filtroBuscar').value.trim().toLowerCase();
+  const filtroCliente  = document.getElementById('filtroCliente').value.trim().toLowerCase();
+
+  const prioridadValor = { Alta:1, Media:2, Baja:3 };
+
+  let lista = ordenes.filter(op => {
+    if (filtroSec !== 'Todas' && op.seccion !== filtroSec) return false;
+    if (filtroPri !== 'Todas' && op.prioridad !== filtroPri) return false;
+
+    if (filtroTxt) {
+      const txt = (op.codigo || '').toLowerCase();
+      if (!txt.includes(filtroTxt)) return false;
+    }
+
+    if (filtroCliente) {
+      const cli = (op.cliente || '').toLowerCase();
+      if (!cli.includes(filtroCliente)) return false;
+    }
+
+    return true;
+  });
+
+  // Orden: fecha más cercana primero, luego prioridad
+  lista.sort((a,b) => {
+    const fa = a.fechaEntrega || '';
+    const fb = b.fechaEntrega || '';
+
+    // Sin fecha vs con fecha
+    if (!fa && fb) return 1;
+    if (fa && !fb) return -1;
+
+    // Ambas con fecha y distintas
+    if (fa && fb && fa !== fb) {
+      return fa.localeCompare(fb);
+    }
+
+    // Misma fecha o ambas vacías: se ordena por prioridad
+    const pa = prioridadValor[a.prioridad] || 99;
+    const pb = prioridadValor[b.prioridad] || 99;
+    return pa - pb;
+  });
+
+  let seccionActual = null;
+
+  lista.forEach(op => {
+    if (op.seccion !== seccionActual) {
+      seccionActual = op.seccion;
+      const h = document.createElement('div');
+      h.className = 'section-title';
+      h.textContent = seccionActual || 'Sin sección';
+      cont.appendChild(h);
+    }
+
+    const card = document.createElement('div');
+    card.className = 'op-card';
+    const prioridad = op.prioridad || 'Media';
+    const prioClass = 'tag-prio-' + prioridad.toLowerCase();
+
+    // Cálculo de días restantes para colorear por proximidad
+    const MS_DAY = 24 * 60 * 60 * 1000;
+    let badgeHtml = '';
+    if (op.fechaEntrega) {
+      const hoy = new Date();
+      const f   = new Date(op.fechaEntrega);
+      if (!isNaN(f)) {
+        const diff = Math.floor((f - hoy) / MS_DAY); // días hasta la entrega
+        if (diff <= 3) {
+          const texto = diff <= 0 ? 'VENCIDA' : `EN ${diff} DÍAS`;
+          badgeHtml = `<span class="due-badge due-red">${texto}</span>`;
+        } else if (diff <= 5) {
+          badgeHtml = `<span class="due-badge due-orange">EN ${diff} DÍAS</span>`;
+        }
+      }
+    }
+
+    card.innerHTML = `
+      <strong>OP:</strong> ${op.codigo}<br>
+      ${op.cliente ? `<strong>Cliente:</strong> ${op.cliente}<br>` : ""}
+      <strong>Fecha entrega:</strong> ${op.fechaEntrega || '-'}${badgeHtml ? ' ' + badgeHtml : ''}<br>
+      <span class="tag-seccion">${op.seccion}</span>
+      <span class="tag-prio ${prioClass}">${prioridad}</span>
+    `;
+    card.onclick = () => abrirDesdeLista(op.codigo);
+    cont.appendChild(card);
+  });
+
+  if (lista.length === 0) {
+    cont.innerHTML = '<p>No hay órdenes.</p>';
+  }
+}
+
+/* --------- SCAN/EDICIÓN --------- */
+
+function abrirScannerManual() {
+  document.getElementById('scannerSim').style.display = 'block';
+}
+
+function abrirScannerCamara() {
+  alert('Aquí activaremos la cámara cuando la app esté servida por HTTPS con acceso a cámara.');
+  document.getElementById('scannerSim').style.display = 'block';
+}
+
+function abrirDesdeLista(codigo) {
+  document.getElementById('scannerSim').style.display = 'block';
+  document.getElementById('codigoInput').value = codigo;
+  simularEscaneo();
+}
+
+function simularEscaneo() {
+  const codigo = document.getElementById('codigoInput').value.trim();
+  const res    = document.getElementById('resultado');
+  const editor = document.getElementById('editorOP');
+
+  if (!codigo) {
+    res.textContent = 'Introduce un código válido';
+    editor.style.display = 'none';
+    return;
+  }
+
+  let op = ordenes.find(o => o.codigo === codigo);
+  if (op) {
+    alert(`La OP ${codigo} ya existe. Se abre para editar, no se crea un duplicado.`);
+  } else {
+    op = {
+      codigo,
+      cliente: '',
+      seccion: 'Corte',
+      fechaEntrega: '',
+      prioridad: 'Media',
+      historial: []
+    };
+    ordenes.push(op);
+    saveOrdenes();
+  }
+
+  opActual = op;
+
+  document.getElementById('opCodigo').textContent   = op.codigo;
+  document.getElementById('clienteInput').value     = op.cliente || '';
+  document.getElementById('seccionSelect').value    = op.seccion || 'Corte';
+  document.getElementById('fechaEntrega').value     = op.fechaEntrega || '';
+  document.getElementById('prioridadSelect').value  = op.prioridad || 'Media';
+
+  res.textContent = `OP ${codigo} cargada.`;
+  editor.style.display = 'block';
+  pintarHistorial();
+}
+
+function guardarOP() {
+  if (!opActual) return;
+
+  const fecha = document.getElementById('fechaEntrega').value;
+  if (!fecha) {
+    alert('La fecha de entrega es obligatoria para crear/actualizar la OP.');
+    return;
+  }
+
+  const seccionAnterior   = opActual.seccion;
+  const prioridadAnterior = opActual.prioridad;
+
+  opActual.cliente      = document.getElementById('clienteInput').value.trim();
+  opActual.seccion      = document.getElementById('seccionSelect').value;
+  opActual.fechaEntrega = fecha;
+  opActual.prioridad    = document.getElementById('prioridadSelect').value;
+
+  const marcaTiempo = new Date().toLocaleString();
+
+  let cambios = [];
+  if (seccionAnterior !== opActual.seccion) {
+    cambios.push(`Sección: ${seccionAnterior || 'Sin'} → ${opActual.seccion}`);
+  }
+  if (prioridadAnterior !== opActual.prioridad) {
+    cambios.push(`Prioridad: ${prioridadAnterior || 'Sin'} → ${opActual.prioridad}`);
+  }
+
+  if (cambios.length > 0) {
+    if (!Array.isArray(opActual.historial)) opActual.historial = [];
+    opActual.historial.push(`${marcaTiempo} — ${cambios.join(' | ')}`);
+  }
+
+  saveOrdenes();
+  renderOrdenes();
+  pintarHistorial();
+
+  document.getElementById('movimientoResultado').textContent =
+    `OP ${opActual.codigo} guardada en sección ${opActual.seccion} con prioridad ${opActual.prioridad}.`;
+}
+
+function eliminarOP() {
+  if (!opActual) return;
+  const codigo = opActual.codigo;
+  if (!confirm(`¿Eliminar la OP ${codigo}?`)) return;
+
+  ordenes = ordenes.filter(o => o.codigo !== codigo);
+  opActual = null;
+
+  document.getElementById('editorOP').style.display = 'none';
+  document.getElementById('resultado').textContent = `OP ${codigo} eliminada.`;
+  document.getElementById('movimientoResultado').textContent = '';
+
+  saveOrdenes();
+  renderOrdenes();
+}
+
+function pintarHistorial() {
+  const ul = document.getElementById('historialOP');
+  ul.innerHTML = '';
+
+  if (!opActual || !Array.isArray(opActual.historial) || opActual.historial.length === 0) {
+    ul.innerHTML = '<li>No hay movimientos registrados.</li>';
+    return;
+  }
+
+  opActual.historial.slice().reverse().forEach(item => {
+    const li = document.createElement('li');
+    li.textContent = item;
+    ul.appendChild(li);
+  });
+}
+
+function toggleHistorial() {
+  const ul = document.getElementById('historialOP');
+  if (ul.style.display === 'none' || ul.style.display === '') {
+    ul.style.display = 'block';
+  } else {
+    ul.style.display = 'none';
+  }
+}
+
+/* ---- REGISTRO DEL SERVICE WORKER ---- */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js')
+      .catch(err => console.log('Fallo al registrar SW', err));
+  });
+}
+
+/* ---- INICIO ---- */
+window.addEventListener('DOMContentLoaded', () => {
+  loadOrdenes();
+  renderOrdenes();
+});
 </script>
 
 </body>
