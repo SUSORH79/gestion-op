@@ -234,7 +234,7 @@ function loadOrdenes() {
     if (!raw) return;
     const data = JSON.parse(raw);
     if (Array.isArray(data)) ordenes = data;
-  } catch(e) {
+  } catch (e) {
     console.error('Error cargando ordenes', e);
   }
 }
@@ -242,27 +242,26 @@ function loadOrdenes() {
 function saveOrdenes() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(ordenes));
-  } catch(e) {
+  } catch (e) {
     console.error('Error guardando ordenes', e);
   }
 }
 
-/* --------- GLOBAL --------- */
 let opActual = null;
 
 /* --------- FILTROS --------- */
 function limpiarFiltros() {
-  document.getElementById('filtroSeccion').value = 'Todas';
+  document.getElementById('filtroSeccion').value  = 'Todas';
   document.getElementById('filtroPrioridad').value = 'Todas';
-  document.getElementById('filtroBuscar').value = '';
-  document.getElementById('filtroCliente').value = '';
+  document.getElementById('filtroBuscar').value   = '';
+  document.getElementById('filtroCliente').value  = '';
   renderOrdenes();
 }
 
 /* Limpieza automática de Archivo (más de 15 días) */
 function limpiarAntiguas() {
   const ahora = new Date();
-  const DIA = 24 * 60 * 60 * 1000;
+  const DIA   = 24 * 60 * 60 * 1000;
 
   const paraBorrar = [];
 
@@ -292,12 +291,13 @@ function renderOrdenes() {
   limpiarAntiguas();
 
   const cont = document.getElementById('opList');
+  if (!cont) return;
   cont.innerHTML = '';
 
-  const filtroSec      = document.getElementById('filtroSeccion').value;
-  const filtroPri      = document.getElementById('filtroPrioridad').value;
-  const filtroTxt      = document.getElementById('filtroBuscar').value.trim().toLowerCase();
-  const filtroCliente  = document.getElementById('filtroCliente').value.trim().toLowerCase();
+  const filtroSec     = document.getElementById('filtroSeccion').value;
+  const filtroPri     = document.getElementById('filtroPrioridad').value;
+  const filtroTxt     = document.getElementById('filtroBuscar').value.trim().toLowerCase();
+  const filtroCliente = document.getElementById('filtroCliente').value.trim().toLowerCase();
 
   const prioridadValor = { Alta:1, Media:2, Baja:3 };
 
@@ -318,8 +318,8 @@ function renderOrdenes() {
     return true;
   });
 
-  // Orden: fecha más cercana primero, luego prioridad
-  lista.sort((a,b) => {
+  // Orden: fecha más cercana primero, luego prioridad (Alta, Media, Baja)
+  lista.sort((a, b) => {
     const fa = a.fechaEntrega || '';
     const fb = b.fechaEntrega || '';
 
@@ -394,7 +394,7 @@ function abrirScannerManual() {
 }
 
 function abrirScannerCamara() {
-  alert('Aquí activaremos la cámara cuando la app esté servida por HTTPS con acceso a cámara.');
+  alert('Aquí activaremos la cámara cuando la app esté servida por HTTPS con permisos de cámara.');
   document.getElementById('scannerSim').style.display = 'block';
 }
 
@@ -499,6 +499,8 @@ function eliminarOP() {
   saveOrdenes();
   renderOrdenes();
 }
+
+/* --------- HISTORIAL --------- */
 
 function pintarHistorial() {
   const ul = document.getElementById('historialOP');
